@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Blog on Sanjay&#39;s Blog</title>
+    <link>http://localhost:1313/categories/blog/</link>
+    <description>Recent content in Blog on Sanjay&#39;s Blog</description>
+    <generator>Hugo -- 0.123.7</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 17 Jul 2024 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/categories/blog/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Index Concurrency</title>
+      <link>http://localhost:1313/posts/index-concurrency/</link>
+      <pubDate>Wed, 17 Jul 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/index-concurrency/</guid>
+      <description>This blog summaries the lecture 8 of cmu - Intro to Database Systems along with some things i learned on the way.
+Concurrency and Parallelism Parallelism:
+Parallelism means running multiple tasks simultaneously. It can be achieved with the help of multiple cores, multiple threads, GPUs, etc.
+Example: In programming, running two different functions at the same time.
+Concurrency:
+Concurrency refers to the ability to run tasks out of order without changing the final outcome.</description>
+    </item>
+    <item>
+      <title>Tree Indices</title>
+      <link>http://localhost:1313/posts/tree-indices/</link>
+      <pubDate>Mon, 17 Jun 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/tree-indices/</guid>
+      <description>Indexes in DBMS Indexes are very similar to the index section of a book. In books, indexes tell us where a word has been used and provide the page numbers. Just like that, indexes in a Database Management System (DBMS) tell us on what page or block a particular record is present.
+So why do we need indexes?
+Indexes save us a lot of time. Instead of searching from the start to the end of the book for a specific word, we can simply look up the index and go to the specific pages.</description>
+    </item>
+    <item>
+      <title>Buffer Pool and Hashing</title>
+      <link>http://localhost:1313/posts/buffer-pool-manager-and-hashing/</link>
+      <pubDate>Thu, 30 May 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/buffer-pool-manager-and-hashing/</guid>
+      <description>This blog is a continuation of the database systems series, covering Lectures 5 and 6 of the Database Systems CMU 15-445/645 course.
+Buffer Pool The buffer pool is the memory present in the main memory (RAM) that is used to store pages that are most frequently used, similar to a cache. It is managed by the DBMS (buffer pool manager), because the DBMS can do a better job of managing pages than the OS.</description>
+    </item>
+    <item>
+      <title>Database Storage</title>
+      <link>http://localhost:1313/posts/database-storage/</link>
+      <pubDate>Wed, 22 May 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/database-storage/</guid>
+      <description>This blog is a continuation of the database systems series, covering Lectures 3 and 4 of the Database Systems CMU 15-445/645 course.
+How does a DBMS store data? A DBMS uses disks for data storage and persistence, and there are many storage devices that the database can use to store data.
+Storage Devices Storage devices are devices that are used to store data. There are mainly two types of storage devices: volatile and non-volatile.</description>
+    </item>
+    <item>
+      <title>Intro to Database Systems</title>
+      <link>http://localhost:1313/posts/database-systems-1/</link>
+      <pubDate>Tue, 07 May 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/database-systems-1/</guid>
+      <description>I am currently studying database systems. This blog summarises lectures 1 and 2, as well as the SQL homework from the Database Systems CMU 15-445/645 course.
+It&amp;rsquo;s fascinating to realize the extent to which we interact with database systems in our daily lives. They&amp;rsquo;re not just confined to large-scale applications but are also embedded in our browsers and mobile devices. Before the advent of database management systems, data management was complex, with a strong coupling between the data and its management.</description>
+    </item>
+    <item>
+      <title>WebHook Tester</title>
+      <link>http://localhost:1313/posts/webhook-tester/</link>
+      <pubDate>Wed, 10 Apr 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/webhook-tester/</guid>
+      <description>What is a webhook?
+A webhook is an HTTP POST request that is made when a change or event happens in a system. For example, this could occur when the system starts, stops, or when certain conditions are met. This HTTP POST request contains information regarding the change, which programmers can use to initiate actions.
+Consider GitHub as an example. When a push event occurs (which is a webhook event), GitHub sends a POST request to the payload URL.</description>
+    </item>
+    <item>
+      <title>TCP</title>
+      <link>http://localhost:1313/posts/tcp/</link>
+      <pubDate>Sun, 21 Jan 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/tcp/</guid>
+      <description>TCP stands for Transmission Control Protocol. It&amp;rsquo;s built upon the IP layer and provides features like reliable packet transmission, flow control, congestion control, and congestion avoidance.
+Why is TCP the most used protocol?
+TCP is widely used because of the features it offers, such as reliable packet transmission, flow control, and others. Reliable transmission ensures data arrives complete and in order, making it crucial for applications like file transfers, email, and web browsing.</description>
+    </item>
+    <item>
+      <title>internet basics</title>
+      <link>http://localhost:1313/posts/internet/</link>
+      <pubDate>Tue, 16 Jan 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/internet/</guid>
+      <description>How information is sent across the internet? Internet is a network of networks, billions of computers interconnect make the internet, information is sent across the internet in the form of packets, packets can be thought of a little containers of data, if you want to share an image to your friend, first the large image is broken down into number of packets, and these packets are transferred to your friend’s computer, in your friends computer they are reordered and assembled together(not necessarily) to form the image</description>
+    </item>
+    <item>
+      <title>event modeling</title>
+      <link>http://localhost:1313/posts/event-modelling/</link>
+      <pubDate>Fri, 12 Jan 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/event-modelling/</guid>
+      <description>event modelling What is event modeling?
+Event modeling is a simple technique used to design a system. It generally takes relatively little time to learn and get started. In event modeling, we use sticky notes to write things down.
+Sticky note colors and their purposes:
+Orange sticky notes: Represent events. We write down the event occurrence in the past tense. Events are generally triggered by the UI or by some external API.</description>
+    </item>
+    <item>
+      <title>learn go with tests</title>
+      <link>http://localhost:1313/posts/learn-go-with-tests/</link>
+      <pubDate>Wed, 03 Jan 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/learn-go-with-tests/</guid>
+      <description>Part 1: Introduction This is an article about my experience completing &amp;ldquo;Go with Tests.&amp;rdquo; I wanted to learn a back-end programming language for web development, so after completing CS50, I first got started with web development from The Odin Project. However, I only did a few lessons and wasn&amp;rsquo;t very consistent. Additionally, I felt like every three out of five engineering college students were learning the MERN tech stack, so I wanted to do something different.</description>
+    </item>
+  </channel>
+</rss>

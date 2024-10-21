@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="noindex, nofollow">
+<title>Buffer Pool and Hashing | Sanjay&#39;s Blog</title>
+<meta name="keywords" content="learn, database">
+<meta name="description" content="This blog is a continuation of the database systems series, covering Lectures 5 and 6 of the Database Systems CMU 15-445/645 course.
+Buffer Pool The buffer pool is the memory present in the main memory (RAM) that is used to store pages that are most frequently used, similar to a cache. It is managed by the DBMS (buffer pool manager), because the DBMS can do a better job of managing pages than the OS.">
+<meta name="author" content="">
+<link rel="canonical" href="http://localhost:1313/posts/2024-5-30-buffer-pool-manager-and-hashing/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.fc220c15db4aef0318bbf30adc45d33d4d7c88deff3238b23eb255afdc472ca6.css" integrity="sha256-/CIMFdtK7wMYu/MK3EXTPU18iN7/MjiyPrJVr9xHLKY=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/favicon.webp">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/posts/2024-5-30-buffer-pool-manager-and-hashing/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="Sanjay&#39;s Blog (Alt + H)">Sanjay&#39;s Blog</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="http://localhost:1313/archives/" title="Archives">
+                    <span>Archives</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="http://localhost:1313/">Home</a>&nbsp;»&nbsp;<a href="http://localhost:1313/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Buffer Pool and Hashing
+    </h1>
+    <div class="post-meta">19 min
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#buffer-pool" aria-label="Buffer Pool">Buffer Pool</a><ul>
+                        
+                <li>
+                    <a href="#buffer-pool-manager" aria-label="Buffer Pool Manager">Buffer Pool Manager</a></li>
+                <li>
+                    <a href="#memory-allocation-policies" aria-label="Memory Allocation Policies">Memory Allocation Policies</a></li>
+                <li>
+                    <a href="#buffer-pool-optimisations" aria-label="Buffer Pool Optimisations">Buffer Pool Optimisations</a><ul>
+                        
+                <li>
+                    <a href="#os-page-cache" aria-label="OS page cache">OS page cache</a></li></ul>
+                </li>
+                <li>
+                    <a href="#buffer-management-policies" aria-label="Buffer Management Policies">Buffer Management Policies</a></li></ul>
+                </li>
+                <li>
+                    <a href="#hash-tables" aria-label="Hash Tables">Hash Tables</a><ul>
+                        <ul>
+                        
+                <li>
+                    <a href="#two-types-of-hashing-static-hashing-and-dynamic-hashing" aria-label="Two types of hashing: static hashing and dynamic hashing">Two types of hashing: static hashing and dynamic hashing</a></li>
+                <li>
+                    <a href="#collision-handling" aria-label="Collision handling">Collision handling</a></li></ul>
+                    
+                <li>
+                    <a href="#static-hashing-techniques" aria-label="Static Hashing techniques">Static Hashing techniques</a><ul>
+                        
+                <li>
+                    <a href="#linear-probing" aria-label="Linear Probing">Linear Probing</a></li>
+                <li>
+                    <a href="#robin-hood-hashing" aria-label="Robin Hood Hashing">Robin Hood Hashing</a></li>
+                <li>
+                    <a href="#cuckoo-hashing" aria-label="Cuckoo Hashing">Cuckoo Hashing</a></li></ul>
+                </li>
+                <li>
+                    <a href="#dynamic-hashing-techniques" aria-label="Dynamic Hashing Techniques">Dynamic Hashing Techniques</a><ul>
+                        
+                <li>
+                    <a href="#chained-hashing" aria-label="Chained Hashing">Chained Hashing</a></li>
+                <li>
+                    <a href="#linear-hashing" aria-label="Linear Hashing">Linear Hashing</a></li>
+                <li>
+                    <a href="#extensible-hashing" aria-label="Extensible Hashing">Extensible Hashing</a>
+                </li>
+            </ul>
+            </li>
+            </ul>
+            </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><p>This blog is a continuation of the database systems series, covering Lectures 5 and 6 of the Database Systems CMU 15-445/645 course.</p>
+<h1 id="buffer-pool">Buffer Pool<a hidden class="anchor" aria-hidden="true" href="#buffer-pool">#</a></h1>
+<p>The buffer pool is the memory present in the main memory (RAM) that is used to store pages that are most frequently used, similar to a cache. It is managed by the DBMS (buffer pool manager), because the DBMS can do a better job of managing pages than the OS. If a query wants to read some records that are present on the disk, the corresponding page should first be fetched into main memory and then read.</p>
+<p>In the buffer pool, pages are stored in an array of pages where each slot is called a frame.</p>
+<p><img loading="lazy" src="/assets/images/2024-5-30-buffer-pool-and-hashing/array_of_pages.png" alt="array_of_pages"  />
+</p>
+<p>Buffer pools are managed by a <strong>Buffer Pool Manager</strong>.</p>
+<h2 id="buffer-pool-manager">Buffer Pool Manager<a hidden class="anchor" aria-hidden="true" href="#buffer-pool-manager">#</a></h2>
+<p>The Buffer Pool Manager is a sub-system of the DBMS that manages the storage present in the main memory (buffer pool). Accessing pages that are present in main memory is much faster than accessing pages that are present on the disk, as they must first be brought into main memory and then read. Therefore, the main goal of a Buffer Pool Manager is to reduce the number of page transfers from disk to main memory, so that most of the pages required by the query are already present in main memory.</p>
+<p>The Buffer Pool Manager needs to store some additional information to manage the buffer pool.</p>
+<p><strong>Page Table:</strong> The page table is an in-memory hash table used for page lookups. It contains a key-value pair where each page ID is mapped to a frame where that page is stored. If a page is needed, the buffer pool manager checks the page table first to see if the page is present, and if it is, it returns the in-memory address of the page.</p>
+<p><img loading="lazy" src="/assets/images/2024-5-30-buffer-pool-and-hashing/page_table.png" alt="page_table"  />
+</p>
+<p>If the page is not present in the page table, it is a page fault. The buffer pool manager first brings the page into main memory, updates the page table, and returns the page address.</p>
+<p>If the page table is full, one of the pages must be evicted, i.e., one of the pages present in a frame must be replaced with the newly required page.</p>
+<p>Note that this page table is also present in the buffer pool and is managed by the buffer pool manager.er</p>
+<p><strong>Dirty Flag:</strong> For example, if a query modifies a page, in reality, it is actually modifying the page that is present in main memory, not the page that is present on the disk. So, if any changes are made to the page, the page is marked with a dirty flag. All pages that have been marked with the dirty flag are written back to the disk to persist the data.</p>
+<p><strong>Output of Pages/Blocks:</strong> As we know, pages with dirty flags should be written back to the disk. The output of pages (i.e., writing pages back to the disk) should not be done only when the page needs to be evicted, but should be done frequently or whenever eviction is needed, and writing also depends on other factors. This is to persist the data so that it is safe, and the page can be evicted directly.</p>
+<p><strong>Pin/Reference Counter:</strong> If a page is being accessed by a thread, the buffer pool manager should make sure that the page is not evicted from the buffer pool. To ensure this, a pin is used. If a thread is accessing a page, the page is pinned, and the buffer pool manager never evicts a pinned page. If the thread completes its operations, it unpins the page, and now the page can be evicted. A single page can be pinned by multiple threads, and a reference counter is used to count the number of threads that are currently accessing the page.</p>
+<p><strong>Share and Exclusive Locks:</strong> If multiple threads are accessing a page, say one is reading and another is writing to the page, the write operation performed by a thread changes the contents of the page, which will make the contents read by another thread inconsistent. To handle this, share and exclusive locks are used. If a thread is reading the contents of a page, it obtains a shared lock on that page. A page can have multiple shared locks, as the contents of the page will not be changed, and the threads will have read the same data. If a page has an exclusive lock, the thread must wait until the exclusive lock is removed to obtain a shared lock. If a thread is writing to the page, it obtains an exclusive lock. To obtain an exclusive lock, the page should not have any locks on it, i.e., only one process is allowed to have an exclusive lock at a time.</p>
+<h2 id="memory-allocation-policies"><strong>Memory Allocation Policies</strong><a hidden class="anchor" aria-hidden="true" href="#memory-allocation-policies">#</a></h2>
+<p>There are two types of memory allocation policies: <strong>Global Policies</strong> and <strong>Local Policies</strong>.</p>
+<p><strong>Global Policies:</strong> These policies make decisions in such a way that the entire workload of a database benefits.</p>
+<p><strong>Local Policies:</strong> These policies make decisions in such a way that only the needs of one transaction are prioritized.</p>
+<p>For example, if there are four transactions that the database is currently processing, and three of the transactions require the same page, if global policies are being used, the buffer pool manager will bring in the page that is required by most of the transactions. If the DBMS is using local policies, it might just bring in the page that is required by only one transaction, which might be selected among others by policies such as priority, FCFS (First-Come-First-Served), and others.</p>
+<h2 id="buffer-pool-optimisations">Buffer Pool Optimisations<a hidden class="anchor" aria-hidden="true" href="#buffer-pool-optimisations">#</a></h2>
+<p><strong>Multiple Buffer Pools:</strong> A DBMS can have multiple buffer pools, each managed by its own buffer pool manager. Generally, only one type of page is stored in a buffer pool, but a buffer pool can also store pages of more than one type. For example, one buffer pool manager records pages, and another buffer pool manager stores index pages. This increases performance as each buffer pool can have its own policies for page output, page eviction, etc.</p>
+<p><strong>Pre-fetching:</strong> Pre-fetching means fetching pages from disk into main memory before a request to access the page has been made. The buffer pool manager can determine which pages are most used, depending on the type of workload, previous queries, and a query will be executed in many steps. The buffer pool manager can predict which pages will be requested in the near future by checking the steps being executed and bring the pages into memory before the request to access the pages is made.</p>
+<p><strong>Scan Sharing:</strong> When accessing records, a pointer traverses each record in a page, processing one at a time. Since a DBMS typically handles multiple queries concurrently, it&rsquo;s possible that two or more queries access the same records. In such cases, the pointer traversing the records can be shared among multiple queries.</p>
+<p><strong>Buffer Pool Bypass:</strong> In buffer pool bypass, some part of the buffer pool memory is specifically assigned to a query process, where the records needed by the query are directly loaded and further used. This is done to avoid the overhead of managing pages in the buffer pool, such as tracking pin/unpin pages, dirty pages, etc. This technique is generally used in large sequential scans. If these pages were normally managed by the buffer pool during a large sequential scan, most of the time would be spent evicting pages, and it would also slow down other concurrent processes.</p>
+<h3 id="os-page-cache">OS page cache<a hidden class="anchor" aria-hidden="true" href="#os-page-cache">#</a></h3>
+<p>Generally, the OS keeps its own cache of pages loaded into memory. As the DBMS is managing memory on its own, the pages kept in the cache by the OS become redundant. So, the DBMS uses direct I/O to avoid duplicate page caches.</p>
+<h2 id="buffer-management-policies">Buffer Management Policies<a hidden class="anchor" aria-hidden="true" href="#buffer-management-policies">#</a></h2>
+<p>If a query needs a page that is not currently in the buffer pool, the buffer pool manager should bring the page into memory and return the address of the frame where the page is stored. But if all frames in the buffer pool are full, then any one of the pages present in memory must be replaced to bring the needed page into memory. It is similar to OS CPU scheduling. The buffer pool manager can use policies such as LRU, FIFO, MRU, CLOCK, etc.</p>
+<p><strong>LRU (Least Recently Used):</strong> LRU stands for least recently used, as the name suggests. The page that has not been accessed for a long time will be removed from memory and replaced by a new page. To handle LRU, it can be implemented using doubly linked lists (more efficient), where the recently accessed page is moved to the top, and the least recently accessed page is present at the last of the doubly linked list. Alternatively, we can maintain a table (less efficient) containing the timestamps of when the pages are last accessed and update the table whenever new accesses are made. LRU is slow as we need to update the table every time, but it is easy to implement, and it is common that the page that is not being used will most likely not be used in the future.</p>
+<p><strong>FIFO (First In First Out):</strong> It is a simple policy where the page that is first brought into memory is selected for eviction when all frames are full. It is similar to the workings of a queue. Similar to LRU, FIFO can be implemented using a linked list (more efficient) or by using a table where the time when the page is loaded into memory is tracked (less efficient).</p>
+<p><strong>CLOCK:</strong> Clock is an efficient but approximate implementation of a LRU policy. Here, each frame is associated with a circular data structure, which is used to store the state flag (reference bit), either 0 or 1, and a pointer, also called the clock hand, is used to traverse these flags. If its flag is 1, then 1 is set to 0. If the flag is 0, the page is selected for eviction. Whenever a new page is loaded into main memory, its reference bit/flag is set to 1. The clock hand performs the traversal around the flags whenever all frames are full and a new page is needed to be loaded into main memory.</p>
+<p><strong>A Little Introduction to Indexes:</strong> Indexes are used to find the block/page in which the record is stored. For example, if we want to find a record given its ID, we can use the indexes to find the block it is present in and load the block/page into memory and read the record. It is really useful as it saves the work of traversing through every page and checking if the record we want is present there.</p>
+<h1 id="hash-tables">Hash Tables<a hidden class="anchor" aria-hidden="true" href="#hash-tables">#</a></h1>
+<p>A hash table contains an array of buckets. Where each bucket can store one or more records, usually a small fixed size. It uses a hash function <code>h(x)</code>which takes in a key value and produces a new value ranging from 0 to B - 1, where B is the total number of buckets. The value produced by the hash function is used as an index where the key will be stored.</p>
+<p>For example, consider <strong><code>h(x) = x % 10</code></strong> , and we want to store a simple record, say “id : 10, name : cosmos”, and we are using id as the key. First, the key is passed into the hash function.</p>
+<p><strong><code>h(10) = 10 % 10 = 0</code> ,</strong> we get 0, we store the record in the bucket whose index is zero.</p>
+<p>The average time complexity of a hash table is O(1) and the worst time complexity of a hash table is O(n).</p>
+<p>Hash functions: An ideal hash function must be faster to compute and must uniformly distribute the keys among all the buckets, and there should be no skew in the distribution of buckets. To avoid skewing of the distribution, one must choose a good hash function, and also in hash tables, usually more buckets are allocated than the total number of keys to further avoid collisions.</p>
+<h3 id="two-types-of-hashing-static-hashing-and-dynamic-hashing"><strong>Two types of hashing: static hashing and dynamic hashing</strong><a hidden class="anchor" aria-hidden="true" href="#two-types-of-hashing-static-hashing-and-dynamic-hashing">#</a></h3>
+<p><strong>Static hashing:</strong> In static hashing, the size of the hashing table is fixed, and the number of keys are known before hashing. The hash function stays constant and is not changed. A disadvantage of static hashing in DBMS is that the number of buckets in the hash table is fixed, and if the memory allocated to the hash table is very much, then it leads to wastage of memory, and if the memory allocated to the hash table is very little, then it leads to more number of collisions and slower lookups.</p>
+<p><strong>Dynamic hashing:</strong> In dynamic hashing, the size of the hash table can be changed, it can both grow and shrink. The output range of the hash function is also changed along with the size of the table. A disadvantage of a dynamic hash table is mainly about resizing of the hash table, it is an overhead as the memory should be allocated again, and every record in the hash table must be hashed again. The resizing is generally done when the load on DBMS is less.</p>
+<h3 id="collision-handling"><strong>Collision handling</strong><a hidden class="anchor" aria-hidden="true" href="#collision-handling">#</a></h3>
+<p>A collision is said to occur when two or more keys are mapped to the same bucket index. Here, two methods can be used: <strong>open addressing</strong> and <strong>closed addressing</strong></p>
+<p><strong>Closed addressing:</strong> Here, a new overflow bucket is used to accommodate the new values in the same bucket index by chaining the buckets (overflow chaining). Closed addressing is generally used in DBMS.</p>
+<p><strong>Open addressing:</strong> Here, the size of the hash table is generally fixed (but can be resized), and no overflow buckets are used. The collisions are handled by placing the new value in some other index of the same hash table, methods such as linear probing, quadratic probing come under this method.</p>
+<h2 id="static-hashing-techniques">Static Hashing techniques<a hidden class="anchor" aria-hidden="true" href="#static-hashing-techniques">#</a></h2>
+<h3 id="linear-probing">Linear Probing<a hidden class="anchor" aria-hidden="true" href="#linear-probing">#</a></h3>
+<p>Linear probing uses an open addressing approach to handle collisions in the hash table.</p>
+<p><strong>Insertion:</strong> In linear probing, if a collision occurs, i.e., there is already a value stored in the bucket (A), then we check if the next bucket (A+1) is empty. If it is, we store the new value there. If not, we again check the next bucket (A+2) and so on. If it is the last bucket in the hash table, we jump to the first bucket in the hash table and continue checking until we find an empty bucket. The initial bucket index is also kept track of so that we don&rsquo;t loop around the buckets.</p>
+<p><strong>Deletion:</strong> Deletions are a bit more complex than insertions in linear probing. Say we want to delete a value in the bucket. We hash its key and find its index. Overflow might have occurred, so we must compare the key in the bucket with the key we want. If they are the same, we delete it. If not, we check the next bucket and so on.</p>
+<p>If there are three values, and if the middle value is deleted, and if we want to get the 3rd value, we do the linear probe again and see that the next value (2nd) is empty. The algorithm might assume that there is no third value, but it&rsquo;s not true. To handle this problem, we use different methods</p>
+<p><strong>Tombstone Approach:</strong> We store a special value in the bucket, which will indicate that an overflowed value is deleted, and there might be some more overflow values in the next buckets.</p>
+<p><strong>Movement Approach:</strong> In this approach, we move all the overflowed buckets up to occupy the newly deleted bucket.</p>
+<p>Linear probing is not generally used in DBMS because the insertion and deletion processes are not efficient, as the number of records might change, and deletions might be performed frequently.</p>
+<h3 id="robin-hood-hashing"><strong>Robin Hood Hashing</strong><a hidden class="anchor" aria-hidden="true" href="#robin-hood-hashing">#</a></h3>
+<p>Robin Hood is a famous character who steals from the rich and gives to the poor.</p>
+<p>Just like the character Robin Hood, Robin Hood hashing also steals from the rich and gives to the poor. So, how can we say that this value is rich and this is poor? This can be done using probe sequence length.</p>
+<p><strong>Probe Sequence Length:</strong> Probe sequence length is the count of the number of buckets we must probe to get to the key we want. For example, say a hash function hashes a key to the index 0, but due to overflow, those buckets are already filled, and say the key is inserted at the index 2. Here, the probe sequence length (PSL) is 2.
+Note: If PSL is less, the element is rich; if PSL is more, the element is poor.</p>
+<p><strong>Insertion:</strong> Insertion in Robin Hood hashing is similar to linear probing. Here, the PSL (probe sequence value) of each key is tracked. If we want to insert a value, we get its key, hash it, and get its index. We check if the bucket at the given index is full. If not, we just insert it there. If it is, we check the next bucket and also check the PSL values (keep in mind that now the PSL value of the key to be inserted is increased by one, as it is now one block away from its hashed index). If the PSL of the key in the bucket is greater than or equal to the PSL of the key to be inserted, we just keep checking further buckets. If the PSL of the key in the bucket is less than the PSL of the key to be inserted (the key in the bucket is considered rich, and the key to be inserted is considered poor), we swap the key present in the bucket with the new key. The old key is again reinserted using the same logic.</p>
+<p>Check out this <a href="https://www.cs.cornell.edu/courses/JavaAndDS/files/hashing_RobinHood.pdf"><strong><em>pdf</em></strong></a> to read more in-depth about Robin Hood hashing.</p>
+<h3 id="cuckoo-hashing"><strong>Cuckoo Hashing</strong><a hidden class="anchor" aria-hidden="true" href="#cuckoo-hashing">#</a></h3>
+<p>Working on Cuckoo Hashing is similar to the behavior of the Cuckoo bird, which lays its eggs in other birds&rsquo; nests and, when those eggs hatch, throws out the eggs of the other birds. Similarly, here, an element occupies the slot of another element and throws out the old element.</p>
+<p>It consists of multiple hash tables, each with its own hash function.</p>
+<p><strong>Insertions:</strong> When inserting an element, the indexes of all the hash tables are calculated using their corresponding hash functions. If any of the buckets is empty, the new element is inserted. If not, one of the buckets is randomly selected, the new element replaces the old element, and the kicked-out element is reinserted into the hash table using the same logic. To prevent infinite loops, it allows only a limited number of reinsertions.</p>
+<h2 id="dynamic-hashing-techniques">Dynamic Hashing Techniques<a hidden class="anchor" aria-hidden="true" href="#dynamic-hashing-techniques">#</a></h2>
+<h3 id="chained-hashing"><strong>Chained Hashing</strong><a hidden class="anchor" aria-hidden="true" href="#chained-hashing">#</a></h3>
+<p>Chained hashing is the simplest form of hashing technique, in which a linked list is used.</p>
+<p><strong>Insertions:</strong> When inserting a value, if the bucket to which the key is hashed is already full and the pointer stored is null, a new overflow bucket is allocated, and a pointer to this new bucket is stored in the old bucket that was full. Now, the new value is stored in the newly created bucket. And if there is a pointer to another bucket, and if a slot is empty in it, the value is inserted there. If even that bucket is full, and there is a pointer stored for another bucket, the other bucket is checked, and so on.</p>
+<h3 id="linear-hashing"><strong>Linear Hashing</strong><a hidden class="anchor" aria-hidden="true" href="#linear-hashing">#</a></h3>
+<p>Linear hashing performs incremental growth of the hash table, where the hash table is not directly doubled in size, but a new bucket is added when an overflow occurs. It uses two hash functions and a pointer known as the split pointer to keep track of which bucket to split next.</p>
+<p><strong>Insertions:</strong> Here, just like every other algorithm, we hash the key and find its hash bucket. If it is empty, we insert it there. If it is not, a new overflow bucket is added. Keep in mind that the overflow bucket can be present in linear hashing, but the number of overflow buckets is generally reduced as the algorithm proceeds. After the new overflow bucket has been added, another new bucket is added to the hash table, and a new hash function is used, say h2. Now, the values in the bucket to which the split pointer is pointing are rehashed again using the new h2 hash function, and the split pointer is made to point to the bucket.</p>
+<p><strong>Lookups:</strong> Lookups are a bit more complex here. Say we want to look up a value; we first hash it using the original hash function h1. If the indexed bucket is present before the split pointer, we rehash it again using the h2 hash function to get the bucket in which it is stored. And if the hashed bucket is present after the split pointer, we use the original hash function itself, so no rehashing is required.</p>
+<p>The linear hashing performs splitting in a round-robin fashion and performs the splitting in the form of rounds. When a round is completed, the split pointer is reset to the 0th bucket. A round is set to be completed if all the initial buckets (those buckets that are present before the expansion) are split.</p>
+<h3 id="extensible-hashing"><strong>Extensible Hashing</strong><a hidden class="anchor" aria-hidden="true" href="#extensible-hashing">#</a></h3>
+<p>Extensible hashing is a dynamic hashing method in which the table is grown and shrunk as requests are made. Usually, the size of the hash table is doubled when growing and halved when being shrunk. Note that even if the size of the hash table is doubled, buckets are not assigned yet, and new buckets are only created when a key is hashed to it. They are only allocated when they are needed. The method uses the first n bits of a hashed value to find the index of the key. Here, the number of first n bits used is called the count. A global count is stored for the entire hash table, and every bucket has its own local count.</p>
+<p><strong>Insertions:</strong> Here, the first n bits of the value generated from hashing the key are used as the index. If there is an empty slot in the bucket, it is inserted there. If not, we first check if we want to increase the size of the hash table. This is done by checking the local count of the bucket and the global count. If both are the same or the local count is greater than the global count, then there is only one element in the hash table that points to the bucket. So, we increase the size of the hash table. We increment the global count by one (n + 1, so now the first n+1 bits are considered), effectively doubling the size of the hash table. For every two entries in the hash table, we make them point to their original bucket, and for the bucket where the overflow occurred, we create a new bucket and assign the second entry to point to the newly created bucket. Then, we retry the insertion, which will now be mostly successful.</p>
+<p>If growing the hash table is not required, we just create a new bucket and assign the second entry pointing to the same bucket to point to the newly created bucket. Then, we retry the insertion, which will now be mostly successful. However, if all the values present in the bucket have the same search key, splitting will not solve the problem, so we must have some kind of way to handle large amounts of duplicate search keys.</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="http://localhost:1313/tags/learn/">Learn</a></li>
+      <li><a href="http://localhost:1313/tags/database/">Database</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="http://localhost:1313/posts/event-modelling/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>event modeling</span>
+  </a>
+  <a class="next" href="http://localhost:1313/posts/database-storage/">
+    <span class="title">Next »</span>
+    <br>
+    <span>Database Storage</span>
+  </a>
+</nav>
+
+
+<ul class="share-buttons">
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Buffer Pool and Hashing on x"
+            href="https://x.com/intent/tweet/?text=Buffer%20Pool%20and%20Hashing&amp;url=http%3a%2f%2flocalhost%3a1313%2fposts%2f2024-5-30-buffer-pool-manager-and-hashing%2f&amp;hashtags=learn%2cdatabase">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M512 62.554 L 512 449.446 C 512 483.97 483.97 512 449.446 512 L 62.554 512 C 28.03 512 0 483.97 0 449.446 L 0 62.554 C 0 28.03 28.029 0 62.554 0 L 449.446 0 C 483.971 0 512 28.03 512 62.554 Z M 269.951 190.75 L 182.567 75.216 L 56 75.216 L 207.216 272.95 L 63.9 436.783 L 125.266 436.783 L 235.9 310.383 L 332.567 436.783 L 456 436.783 L 298.367 228.367 L 432.367 75.216 L 371.033 75.216 Z M 127.633 110 L 164.101 110 L 383.481 400.065 L 349.5 400.065 Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Buffer Pool and Hashing on linkedin"
+            href="https://www.linkedin.com/shareArticle?mini=true&amp;url=http%3a%2f%2flocalhost%3a1313%2fposts%2f2024-5-30-buffer-pool-manager-and-hashing%2f&amp;title=Buffer%20Pool%20and%20Hashing&amp;summary=Buffer%20Pool%20and%20Hashing&amp;source=http%3a%2f%2flocalhost%3a1313%2fposts%2f2024-5-30-buffer-pool-manager-and-hashing%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-288.985,423.278l0,-225.717l-75.04,0l0,225.717l75.04,0Zm270.539,0l0,-129.439c0,-69.333 -37.018,-101.586 -86.381,-101.586c-39.804,0 -57.634,21.891 -67.617,37.266l0,-31.958l-75.021,0c0.995,21.181 0,225.717 0,225.717l75.02,0l0,-126.056c0,-6.748 0.486,-13.492 2.474,-18.315c5.414,-13.475 17.767,-27.434 38.494,-27.434c27.135,0 38.007,20.707 38.007,51.037l0,120.768l75.024,0Zm-307.552,-334.556c-25.674,0 -42.448,16.879 -42.448,39.002c0,21.658 16.264,39.002 41.455,39.002l0.484,0c26.165,0 42.452,-17.344 42.452,-39.002c-0.485,-22.092 -16.241,-38.954 -41.943,-39.002Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Buffer Pool and Hashing on reddit"
+            href="https://reddit.com/submit?url=http%3a%2f%2flocalhost%3a1313%2fposts%2f2024-5-30-buffer-pool-manager-and-hashing%2f&title=Buffer%20Pool%20and%20Hashing">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-3.446,265.638c0,-22.964 -18.616,-41.58 -41.58,-41.58c-11.211,0 -21.361,4.457 -28.841,11.666c-28.424,-20.508 -67.586,-33.757 -111.204,-35.278l18.941,-89.121l61.884,13.157c0.756,15.734 13.642,28.29 29.56,28.29c16.407,0 29.706,-13.299 29.706,-29.701c0,-16.403 -13.299,-29.702 -29.706,-29.702c-11.666,0 -21.657,6.792 -26.515,16.578l-69.105,-14.69c-1.922,-0.418 -3.939,-0.042 -5.585,1.036c-1.658,1.073 -2.811,2.761 -3.224,4.686l-21.152,99.438c-44.258,1.228 -84.046,14.494 -112.837,35.232c-7.468,-7.164 -17.589,-11.591 -28.757,-11.591c-22.965,0 -41.585,18.616 -41.585,41.58c0,16.896 10.095,31.41 24.568,37.918c-0.639,4.135 -0.99,8.328 -0.99,12.576c0,63.977 74.469,115.836 166.33,115.836c91.861,0 166.334,-51.859 166.334,-115.836c0,-4.218 -0.347,-8.387 -0.977,-12.493c14.564,-6.47 24.735,-21.034 24.735,-38.001Zm-119.474,108.193c-20.27,20.241 -59.115,21.816 -70.534,21.816c-11.428,0 -50.277,-1.575 -70.522,-21.82c-3.007,-3.008 -3.007,-7.882 0,-10.889c3.003,-2.999 7.882,-3.003 10.885,0c12.777,12.781 40.11,17.317 59.637,17.317c19.522,0 46.86,-4.536 59.657,-17.321c3.016,-2.999 7.886,-2.995 10.885,0.008c3.008,3.011 3.003,7.882 -0.008,10.889Zm-5.23,-48.781c-16.373,0 -29.701,-13.324 -29.701,-29.698c0,-16.381 13.328,-29.714 29.701,-29.714c16.378,0 29.706,13.333 29.706,29.714c0,16.374 -13.328,29.698 -29.706,29.698Zm-160.386,-29.702c0,-16.381 13.328,-29.71 29.714,-29.71c16.369,0 29.689,13.329 29.689,29.71c0,16.373 -13.32,29.693 -29.689,29.693c-16.386,0 -29.714,-13.32 -29.714,-29.693Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Buffer Pool and Hashing on facebook"
+            href="https://facebook.com/sharer/sharer.php?u=http%3a%2f%2flocalhost%3a1313%2fposts%2f2024-5-30-buffer-pool-manager-and-hashing%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-106.468,0l0,-192.915l66.6,0l12.672,-82.621l-79.272,0l0,-53.617c0,-22.603 11.073,-44.636 46.58,-44.636l36.042,0l0,-70.34c0,0 -32.71,-5.582 -63.982,-5.582c-65.288,0 -107.96,39.569 -107.96,111.204l0,62.971l-72.573,0l0,82.621l72.573,0l0,192.915l-191.104,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Buffer Pool and Hashing on whatsapp"
+            href="https://api.whatsapp.com/send?text=Buffer%20Pool%20and%20Hashing%20-%20http%3a%2f%2flocalhost%3a1313%2fposts%2f2024-5-30-buffer-pool-manager-and-hashing%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-58.673,127.703c-33.842,-33.881 -78.847,-52.548 -126.798,-52.568c-98.799,0 -179.21,80.405 -179.249,179.234c-0.013,31.593 8.241,62.428 23.927,89.612l-25.429,92.884l95.021,-24.925c26.181,14.28 55.659,21.807 85.658,21.816l0.074,0c98.789,0 179.206,-80.413 179.247,-179.243c0.018,-47.895 -18.61,-92.93 -52.451,-126.81Zm-126.797,275.782l-0.06,0c-26.734,-0.01 -52.954,-7.193 -75.828,-20.767l-5.441,-3.229l-56.386,14.792l15.05,-54.977l-3.542,-5.637c-14.913,-23.72 -22.791,-51.136 -22.779,-79.287c0.033,-82.142 66.867,-148.971 149.046,-148.971c39.793,0.014 77.199,15.531 105.329,43.692c28.128,28.16 43.609,65.592 43.594,105.4c-0.034,82.149 -66.866,148.983 -148.983,148.984Zm81.721,-111.581c-4.479,-2.242 -26.499,-13.075 -30.604,-14.571c-4.105,-1.495 -7.091,-2.241 -10.077,2.241c-2.986,4.483 -11.569,14.572 -14.182,17.562c-2.612,2.988 -5.225,3.364 -9.703,1.12c-4.479,-2.241 -18.91,-6.97 -36.017,-22.23c-13.314,-11.876 -22.304,-26.542 -24.916,-31.026c-2.612,-4.484 -0.279,-6.908 1.963,-9.14c2.016,-2.007 4.48,-5.232 6.719,-7.847c2.24,-2.615 2.986,-4.484 4.479,-7.472c1.493,-2.99 0.747,-5.604 -0.374,-7.846c-1.119,-2.241 -10.077,-24.288 -13.809,-33.256c-3.635,-8.733 -7.327,-7.55 -10.077,-7.688c-2.609,-0.13 -5.598,-0.158 -8.583,-0.158c-2.986,0 -7.839,1.121 -11.944,5.604c-4.105,4.484 -15.675,15.32 -15.675,37.364c0,22.046 16.048,43.342 18.287,46.332c2.24,2.99 31.582,48.227 76.511,67.627c10.685,4.615 19.028,7.371 25.533,9.434c10.728,3.41 20.492,2.929 28.209,1.775c8.605,-1.285 26.499,-10.833 30.231,-21.295c3.732,-10.464 3.732,-19.431 2.612,-21.298c-1.119,-1.869 -4.105,-2.99 -8.583,-5.232Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Buffer Pool and Hashing on telegram"
+            href="https://telegram.me/share/url?text=Buffer%20Pool%20and%20Hashing&amp;url=http%3a%2f%2flocalhost%3a1313%2fposts%2f2024-5-30-buffer-pool-manager-and-hashing%2f">
+            <svg version="1.1" xml:space="preserve" viewBox="2 2 28 28" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M26.49,29.86H5.5a3.37,3.37,0,0,1-2.47-1,3.35,3.35,0,0,1-1-2.47V5.48A3.36,3.36,0,0,1,3,3,3.37,3.37,0,0,1,5.5,2h21A3.38,3.38,0,0,1,29,3a3.36,3.36,0,0,1,1,2.46V26.37a3.35,3.35,0,0,1-1,2.47A3.38,3.38,0,0,1,26.49,29.86Zm-5.38-6.71a.79.79,0,0,0,.85-.66L24.73,9.24a.55.55,0,0,0-.18-.46.62.62,0,0,0-.41-.17q-.08,0-16.53,6.11a.59.59,0,0,0-.41.59.57.57,0,0,0,.43.52l4,1.24,1.61,4.83a.62.62,0,0,0,.63.43.56.56,0,0,0,.4-.17L16.54,20l4.09,3A.9.9,0,0,0,21.11,23.15ZM13.8,20.71l-1.21-4q8.72-5.55,8.78-5.55c.15,0,.23,0,.23.16a.18.18,0,0,1,0,.06s-2.51,2.3-7.52,6.8Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Buffer Pool and Hashing on ycombinator"
+            href="https://news.ycombinator.com/submitlink?t=Buffer%20Pool%20and%20Hashing&u=http%3a%2f%2flocalhost%3a1313%2fposts%2f2024-5-30-buffer-pool-manager-and-hashing%2f">
+            <svg version="1.1" xml:space="preserve" width="30px" height="30px" viewBox="0 0 512 512" fill="currentColor"
+                xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape">
+                <path
+                    d="M449.446 0C483.971 0 512 28.03 512 62.554L512 449.446C512 483.97 483.97 512 449.446 512L62.554 512C28.03 512 0 483.97 0 449.446L0 62.554C0 28.03 28.029 0 62.554 0L449.446 0ZM183.8767 87.9921H121.8427L230.6673 292.4508V424.0079H281.3328V292.4508L390.1575 87.9921H328.1233L256 238.2489z" />
+            </svg>
+        </a>
+    </li>
+</ul>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2024 <a href="http://localhost:1313/">Sanjay&#39;s Blog</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

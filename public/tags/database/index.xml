@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Database on Sanjay&#39;s Blog</title>
+    <link>http://localhost:1313/tags/database/</link>
+    <description>Recent content in Database on Sanjay&#39;s Blog</description>
+    <generator>Hugo -- 0.123.7</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 17 Jul 2024 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/database/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Index Concurrency</title>
+      <link>http://localhost:1313/posts/index-concurrency/</link>
+      <pubDate>Wed, 17 Jul 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/index-concurrency/</guid>
+      <description>This blog summaries the lecture 8 of cmu - Intro to Database Systems along with some things i learned on the way.
+Concurrency and Parallelism Parallelism:
+Parallelism means running multiple tasks simultaneously. It can be achieved with the help of multiple cores, multiple threads, GPUs, etc.
+Example: In programming, running two different functions at the same time.
+Concurrency:
+Concurrency refers to the ability to run tasks out of order without changing the final outcome.</description>
+    </item>
+    <item>
+      <title>Tree Indices</title>
+      <link>http://localhost:1313/posts/tree-indices/</link>
+      <pubDate>Mon, 17 Jun 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/tree-indices/</guid>
+      <description>Indexes in DBMS Indexes are very similar to the index section of a book. In books, indexes tell us where a word has been used and provide the page numbers. Just like that, indexes in a Database Management System (DBMS) tell us on what page or block a particular record is present.
+So why do we need indexes?
+Indexes save us a lot of time. Instead of searching from the start to the end of the book for a specific word, we can simply look up the index and go to the specific pages.</description>
+    </item>
+    <item>
+      <title>Buffer Pool and Hashing</title>
+      <link>http://localhost:1313/posts/buffer-pool-manager-and-hashing/</link>
+      <pubDate>Thu, 30 May 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/buffer-pool-manager-and-hashing/</guid>
+      <description>This blog is a continuation of the database systems series, covering Lectures 5 and 6 of the Database Systems CMU 15-445/645 course.
+Buffer Pool The buffer pool is the memory present in the main memory (RAM) that is used to store pages that are most frequently used, similar to a cache. It is managed by the DBMS (buffer pool manager), because the DBMS can do a better job of managing pages than the OS.</description>
+    </item>
+    <item>
+      <title>Database Storage</title>
+      <link>http://localhost:1313/posts/database-storage/</link>
+      <pubDate>Wed, 22 May 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/database-storage/</guid>
+      <description>This blog is a continuation of the database systems series, covering Lectures 3 and 4 of the Database Systems CMU 15-445/645 course.
+How does a DBMS store data? A DBMS uses disks for data storage and persistence, and there are many storage devices that the database can use to store data.
+Storage Devices Storage devices are devices that are used to store data. There are mainly two types of storage devices: volatile and non-volatile.</description>
+    </item>
+    <item>
+      <title>Intro to Database Systems</title>
+      <link>http://localhost:1313/posts/database-systems-1/</link>
+      <pubDate>Tue, 07 May 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/database-systems-1/</guid>
+      <description>I am currently studying database systems. This blog summarises lectures 1 and 2, as well as the SQL homework from the Database Systems CMU 15-445/645 course.
+It&amp;rsquo;s fascinating to realize the extent to which we interact with database systems in our daily lives. They&amp;rsquo;re not just confined to large-scale applications but are also embedded in our browsers and mobile devices. Before the advent of database management systems, data management was complex, with a strong coupling between the data and its management.</description>
+    </item>
+  </channel>
+</rss>

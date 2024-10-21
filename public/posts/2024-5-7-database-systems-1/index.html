@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="noindex, nofollow">
+<title>Intro to Database Systems | Sanjay&#39;s Blog</title>
+<meta name="keywords" content="database, sql">
+<meta name="description" content="I am currently studying database systems. This blog summarises lectures 1 and 2, as well as the SQL homework from the Database Systems CMU 15-445/645 course.
+It&rsquo;s fascinating to realize the extent to which we interact with database systems in our daily lives. They&rsquo;re not just confined to large-scale applications but are also embedded in our browsers and mobile devices. Before the advent of database management systems, data management was complex, with a strong coupling between the data and its management.">
+<meta name="author" content="">
+<link rel="canonical" href="http://localhost:1313/posts/2024-5-7-database-systems-1/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.fc220c15db4aef0318bbf30adc45d33d4d7c88deff3238b23eb255afdc472ca6.css" integrity="sha256-/CIMFdtK7wMYu/MK3EXTPU18iN7/MjiyPrJVr9xHLKY=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/favicon.webp">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/posts/2024-5-7-database-systems-1/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="Sanjay&#39;s Blog (Alt + H)">Sanjay&#39;s Blog</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="http://localhost:1313/archives/" title="Archives">
+                    <span>Archives</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="http://localhost:1313/">Home</a>&nbsp;»&nbsp;<a href="http://localhost:1313/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Intro to Database Systems
+    </h1>
+    <div class="post-meta">8 min
+
+</div>
+  </header> 
+
+  <div class="post-content"><p>I am currently studying database systems. This blog summarises lectures 1 and 2, as well as the SQL homework from the <strong><a href="https://15445.courses.cs.cmu.edu/fall2021/">Database Systems</a></strong> CMU 15-445/645 course.</p>
+<p>It&rsquo;s fascinating to realize the extent to which we interact with database systems in our daily lives. They&rsquo;re not just confined to large-scale applications but are also embedded in our browsers and mobile devices. Before the advent of database management systems, data management was complex, with a strong coupling between the data and its management. This required constant re-implementation for different applications.</p>
+<p>To address this issue, Edgar F. Codd introduced the concept of the relational model, one of many data models including graph, network, document, and arrays/matrices.</p>
+<blockquote>
+<p>A data model is a collection of concepts for describing the data in a database. The relational model is an example of a data model.</p>
+</blockquote>
+<p>The most widely used database system is the relational database, which was developed based on Edgar F. Codd&rsquo;s proposals. In this system, data is stored in a relation (or table), and each record (row) or tuple contains the data. A relation consists of attributes (columns).</p>
+<p>So, how do we communicate with a DBMS?</p>
+<p>We use Data Manipulation Languages (DMLs) which can be procedural or non-procedural (declarative). Procedural languages specify both what we want and how we want the data, while non-procedural languages only specify what we want, leaving the retrieval method up to the DBMS.</p>
+<p>Relational algebra, is like a math of databases and uses special symbols to represent specific operations on relations. Each operation takes one or more relations as input and produces a new relation as output.</p>
+<p>There are several types of operations in relational algebra:</p>
+<ul>
+<li><strong>Select</strong>: This operation takes a relation and outputs a subset of tuples that satisfy a certain condition or predicate.</li>
+<li><strong>Projection</strong>: It outputs a relation with tuples containing only specified attributes.</li>
+<li><strong>Union</strong>: This operation outputs a relation containing all tuples appearing in at least one of the input relations.</li>
+<li><strong>Intersection</strong>: It outputs a relation containing all tuples appearing in both input relations.</li>
+<li><strong>Difference</strong>: This operation outputs a relation containing all tuples appearing in the first relation but not the second.</li>
+<li><strong>Product</strong>: It outputs a relation containing all possible combinations of tuples from the input relations.</li>
+<li><strong>Join</strong>: This operation outputs a relation where two relations are joined on a specific attribute.</li>
+</ul>
+<p>SQL is a non-procedural language, that is we only say what we want, and how? is managed by the database, there are many SQL database systems such as postgreSQL, MySQL, sqlite, all the SQL database are mostly similar but there is a difference in the methods offered and how the database system manages different types, a database system is said to support SQL if it implements SQL 92,</p>
+<p>here are my answers for the assignment along with some expiation</p>
+<p>Q1</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> CategoryName
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> Category
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">ORDER</span> <span style="color:#66d9ef">BY</span> CategoryName;
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- this command just selects the CategoryName attribute from Category Relation
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- and they tuples are ordered by the category name in ascending order
+</span></span></span></code></pre></div><p>Q2</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#66d9ef">DISTINCT</span> ShipName,
+</span></span><span style="display:flex;"><span>    SUBSTR(ShipName, <span style="color:#ae81ff">0</span>, INSTR(ShipName, <span style="color:#e6db74">&#39;-&#39;</span>))
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> <span style="color:#e6db74">&#34;Order&#34;</span> <span style="color:#66d9ef">AS</span> o
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">WHERE</span> o.ShipName <span style="color:#66d9ef">LIKE</span> <span style="color:#e6db74">&#34;%-%&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">ORDER</span> <span style="color:#66d9ef">BY</span> o.ShipName;
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- this command selects shipName attribute and
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- all the characters preceding hypen &#39;-&#39;, this is achived
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- by using the INSTR string function, which can be used to
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- get the position of a character in a string,
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- and SUBSTR function is used to get a substring of a string
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- LIKE is used for wild card matching of string, where &#39;%&#39; any characters
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- including an empty string &#39;&#39;
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- the retreived tuples are ordred by the shipName
+</span></span></span></code></pre></div><p>Q3</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> Id,
+</span></span><span style="display:flex;"><span>    ShipCountry,
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">CASE</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">WHEN</span> (ShipCountry <span style="color:#66d9ef">LIKE</span> <span style="color:#e6db74">&#39;USA&#39;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">OR</span> (ShipCountry <span style="color:#66d9ef">LIKE</span> <span style="color:#e6db74">&#39;Mexico&#39;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">OR</span> (ShipCountry <span style="color:#66d9ef">LIKE</span> <span style="color:#e6db74">&#39;Canada&#39;</span>) <span style="color:#66d9ef">THEN</span> <span style="color:#e6db74">&#39;NorthAmerica&#39;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">ELSE</span> <span style="color:#e6db74">&#39;OtherPlace&#39;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">END</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> <span style="color:#e6db74">&#34;Order&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">WHERE</span> Id <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">15445</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">ORDER</span> <span style="color:#66d9ef">BY</span> Id
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">LIMIT</span> <span style="color:#ae81ff">20</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- this command selects the Id and ShipCountry attribute from &#34;Order&#34; relation
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- CASE is similar to if else in general progrmming, it is used to check if the
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- ShipCountry is &#39;USA&#39; or &#39;Mexico&#39; or &#39;Cannada&#39;, if it is then the value &#39;NorthAmerica&#39;
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- is stored in tuple else &#39;OtherPlace&#39; is stored in the tuple
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- again ORDER BY is used to order the typle according to their Id
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- WHERE Id &gt;= 15445 is used to select only the tuples having Id more then 15445
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- LIMIT is used to limit the output to only 20 tuples(rows)
+</span></span></span></code></pre></div><p>Q4</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">WITH</span> orderDelay (ShipId, delay) <span style="color:#66d9ef">AS</span> (
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">SELECT</span> ShipVia,
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">CASE</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">WHEN</span> ShippedDate <span style="color:#f92672">&gt;</span> RequiredDate <span style="color:#66d9ef">THEN</span> <span style="color:#e6db74">&#39;late&#39;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">ELSE</span> <span style="color:#e6db74">&#39;ontime&#39;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">END</span> <span style="color:#66d9ef">AS</span> delay
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">FROM</span> <span style="color:#e6db74">&#34;Order&#34;</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> CompanyName,
+</span></span><span style="display:flex;"><span>    ROUND(
+</span></span><span style="display:flex;"><span>        <span style="color:#ae81ff">100</span>.<span style="color:#ae81ff">0</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">COUNT</span>(
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">CASE</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">WHEN</span> od.delay <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;late&#39;</span> <span style="color:#66d9ef">THEN</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">ELSE</span> <span style="color:#66d9ef">NULL</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">END</span>
+</span></span><span style="display:flex;"><span>        ) <span style="color:#f92672">/</span> <span style="color:#66d9ef">COUNT</span>(<span style="color:#f92672">*</span>),
+</span></span><span style="display:flex;"><span>        <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>    ) <span style="color:#66d9ef">AS</span> delayPercentage
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> orderDelay <span style="color:#66d9ef">AS</span> od,
+</span></span><span style="display:flex;"><span>    Shipper
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">WHERE</span> od.ShipId <span style="color:#f92672">=</span> Shipper.Id
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">GROUP</span> <span style="color:#66d9ef">BY</span> ShipId
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- WITH AS statement is used to create an temprovary table
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- which has ShipVia attribute stored as ShipId and it is calcuated if the
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- order was late using ShippedDate and RequiredDate attributes and stored
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- as delay attribute in orderDelay table
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- were are SELECTing CompanyName and calculating the percentage of late orders
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- and rounding them to 2 decimal places using ROUND function and storing it as
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- delayPercentage attribute, we are using both the Shipper, and the newly created
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- orderDelay Relation to calculate the delayPercentage
+</span></span></span></code></pre></div><p>Q5</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> CategoryName,
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">COUNT</span>(<span style="color:#f92672">*</span>) <span style="color:#66d9ef">AS</span> numberOfProducts,
+</span></span><span style="display:flex;"><span>    ROUND(<span style="color:#66d9ef">AVG</span>(UnitPrice), <span style="color:#ae81ff">2</span>),
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">MIN</span>(UnitPrice),
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">MAX</span>(UnitPrice),
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">SUM</span>(UnitsOnOrder)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> <span style="color:#e6db74">&#34;Product&#34;</span> <span style="color:#66d9ef">AS</span> p
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">JOIN</span> <span style="color:#e6db74">&#34;Category&#34;</span> <span style="color:#66d9ef">AS</span> <span style="color:#66d9ef">c</span> <span style="color:#66d9ef">ON</span> p.CategoryId <span style="color:#f92672">=</span> <span style="color:#66d9ef">c</span>.Id
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">GROUP</span> <span style="color:#66d9ef">BY</span> <span style="color:#66d9ef">c</span>.Id
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- here we are joining two relations &#34;Product&#34; and &#34;Category&#34; based on the CategoryId
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- and calculating umberOfProducts using COUNT, average UnitPrice using AVG, minimum
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- UnitPrice using MIN and maximum UnitPrice using MAX and total orders using SUM
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- aggrigate functions,
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- here the GROUP BY is used to group the tuples having same CategoryId, hence the
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- aggrigate function performs operations on the gorups of tuples having same
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- CategoryId
+</span></span></span></code></pre></div><p>Q6</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">WITH</span> discounted (orderId, productId) <span style="color:#66d9ef">AS</span> (
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">SELECT</span> OrderId,
+</span></span><span style="display:flex;"><span>        ProductId
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">FROM</span> OrderDetail <span style="color:#66d9ef">as</span> od,
+</span></span><span style="display:flex;"><span>        Product <span style="color:#66d9ef">as</span> p
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">WHERE</span> od.ProductId <span style="color:#f92672">=</span> p.Id
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">AND</span> p.Discontinued <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> ProductName,
+</span></span><span style="display:flex;"><span>    CompanyName,
+</span></span><span style="display:flex;"><span>    ContactName
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> (
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span>,
+</span></span><span style="display:flex;"><span>            RANK() OVER(
+</span></span><span style="display:flex;"><span>                PARTITION <span style="color:#66d9ef">BY</span> d.ProductId
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">ORDER</span> <span style="color:#66d9ef">BY</span> o.OrderDate
+</span></span><span style="display:flex;"><span>            ) <span style="color:#66d9ef">as</span> rank
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">FROM</span> <span style="color:#e6db74">&#34;Order&#34;</span> <span style="color:#66d9ef">as</span> o,
+</span></span><span style="display:flex;"><span>            discounted <span style="color:#66d9ef">as</span> d
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">WHERE</span> o.id <span style="color:#f92672">=</span> d.orderId
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">JOIN</span> Customer <span style="color:#66d9ef">ON</span> CustomerId <span style="color:#f92672">=</span> Customer.Id
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">JOIN</span> Product <span style="color:#66d9ef">ON</span> Product.id <span style="color:#f92672">=</span> ProductId
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">WHERE</span> rank <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">ORDER</span> <span style="color:#66d9ef">BY</span> ProductName
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- here we are getting a relation of all the products, which are discounted
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- and storing the obtained tuples in discounted relation
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- we use inner Query to add a new attribute of rank based on
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- when the companies have ordered the product, this is acheived
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- using the RANK window function and PARTITION BY and ORDER BY
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- so tuple having RANK 1 ordered the product first
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- finally in the outer query we only select the companies which
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- brough the product first
+</span></span></span></code></pre></div><p>Q7</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> o.Id,
+</span></span><span style="display:flex;"><span>    OrderDate,
+</span></span><span style="display:flex;"><span>    LAG(OrderDate, <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">0</span>) OVER(
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">ORDER</span> <span style="color:#66d9ef">BY</span> OrderDate
+</span></span><span style="display:flex;"><span>    ) <span style="color:#66d9ef">AS</span> PreviousOrderDate,
+</span></span><span style="display:flex;"><span>    ROUND(
+</span></span><span style="display:flex;"><span>        julianday(OrderDate) <span style="color:#f92672">-</span> julianday(
+</span></span><span style="display:flex;"><span>            LAG(OrderDate, <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">0</span>) OVER(
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">ORDER</span> <span style="color:#66d9ef">BY</span> OrderDate
+</span></span><span style="display:flex;"><span>            )
+</span></span><span style="display:flex;"><span>        ),
+</span></span><span style="display:flex;"><span>        <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>    ) <span style="color:#66d9ef">AS</span> <span style="color:#e6db74">&#39;Lag&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> <span style="color:#e6db74">&#34;Order&#34;</span> <span style="color:#66d9ef">AS</span> o,
+</span></span><span style="display:flex;"><span>    Customer <span style="color:#66d9ef">AS</span> <span style="color:#66d9ef">c</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">WHERE</span> o.CustomerId <span style="color:#f92672">=</span> <span style="color:#66d9ef">c</span>.Id
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">AND</span> o.CustomerId <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;BLONP&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">ORDER</span> <span style="color:#66d9ef">BY</span> OrderDate
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">LIMIT</span> <span style="color:#ae81ff">10</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- here we mainly use the LAG function to get the value of the
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- preceding tuple, LAG should almost always be used with ORDER BY
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- becuase if we didn&#39;t use the ORDER BY the ouput can be randomized
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- we are caclucating the time difference between two orders using
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- the LAG aggrigate function and julianday function as ouputing it as
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- &#39;LAG&#39; attribute
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- we are limiting the output to 10 tuples using LIMIT
+</span></span></span></code></pre></div><p>Q8</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">WITH</span> expendeture(Id, expen) <span style="color:#66d9ef">AS</span> (
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">SELECT</span> CustomerId <span style="color:#66d9ef">as</span> Id,
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">SUM</span>(UnitPrice <span style="color:#f92672">*</span> Quantity) <span style="color:#66d9ef">AS</span> expen
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">FROM</span> <span style="color:#e6db74">&#34;Order&#34;</span> <span style="color:#66d9ef">AS</span> o
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">JOIN</span> OrderDetail <span style="color:#66d9ef">AS</span> od <span style="color:#66d9ef">ON</span> o.Id <span style="color:#f92672">=</span> od.OrderId
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">GROUP</span> <span style="color:#66d9ef">BY</span> CustomerId
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#66d9ef">CASE</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">WHEN</span> (
+</span></span><span style="display:flex;"><span>            e.Id <span style="color:#66d9ef">NOT</span> <span style="color:#66d9ef">IN</span> (
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">SELECT</span> Id
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">FROM</span> Customer
+</span></span><span style="display:flex;"><span>            )
+</span></span><span style="display:flex;"><span>        ) <span style="color:#66d9ef">THEN</span> <span style="color:#e6db74">&#39;MISSING_NAME&#39;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">ELSE</span> (
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">SELECT</span> CompanyName
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">FROM</span> Customer
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">WHERE</span> e.Id <span style="color:#f92672">=</span> Id
+</span></span><span style="display:flex;"><span>        )
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">END</span> <span style="color:#66d9ef">AS</span> <span style="color:#e6db74">&#39;CompanyName&#39;</span>,
+</span></span><span style="display:flex;"><span>    e.Id <span style="color:#66d9ef">AS</span> <span style="color:#e6db74">&#39;CustomerId&#39;</span>,
+</span></span><span style="display:flex;"><span>    ROUND(e.expen, <span style="color:#ae81ff">2</span>) <span style="color:#66d9ef">AS</span> <span style="color:#e6db74">&#39;Expences&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> expendeture <span style="color:#66d9ef">AS</span> e
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">ORDER</span> <span style="color:#66d9ef">BY</span> e.expen
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- here we create a new table which contains the customerId and
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- customer expences as attributes then in the outer query
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- we are using case to check if the customer in present in the customer table
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- if present we use the CompanyName else we use &#39;MISSING_NAME&#39;
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- we round the expences of company to
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- two decimal places using ROUND function
+</span></span></span></code></pre></div><p>Q9</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">select</span> RegionDescription,
+</span></span><span style="display:flex;"><span>    FirstName,
+</span></span><span style="display:flex;"><span>    LastName,
+</span></span><span style="display:flex;"><span>    BirthDate
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> (
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">select</span> <span style="color:#f92672">*</span>,
+</span></span><span style="display:flex;"><span>            RANK() OVER(
+</span></span><span style="display:flex;"><span>                PARTITION <span style="color:#66d9ef">BY</span> r.id
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">ORDER</span> <span style="color:#66d9ef">BY</span> BirthDate <span style="color:#66d9ef">DESC</span>
+</span></span><span style="display:flex;"><span>            ) <span style="color:#66d9ef">AS</span> rank
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">from</span> Employee <span style="color:#66d9ef">as</span> e
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">JOIN</span> EmployeeTerritory <span style="color:#66d9ef">as</span> et <span style="color:#66d9ef">ON</span> e.id <span style="color:#f92672">=</span> et.EmployeeId
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">JOIN</span> Territory <span style="color:#66d9ef">as</span> t <span style="color:#66d9ef">ON</span> et.TerritoryId <span style="color:#f92672">=</span> t.Id
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">JOIN</span> Region <span style="color:#66d9ef">as</span> r <span style="color:#66d9ef">ON</span> t.RegionId <span style="color:#f92672">=</span> r.Id
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">WHERE</span> rank <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">GROUP</span> <span style="color:#66d9ef">BY</span> Id
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">ORDER</span> <span style="color:#66d9ef">BY</span> RegionId
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- here we are using the inner query, to rank the employee
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- according to their birthdate
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- and in the outer query we are selecting the employee whose rank is 1
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- and ordering the output by RegionId
+</span></span></span></code></pre></div><p>Q10</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">WITH</span> productNames(pname, id) <span style="color:#66d9ef">AS</span> (
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">SELECT</span> ProductName,
+</span></span><span style="display:flex;"><span>        ROW_NUMBER() OVER(
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">ORDER</span> <span style="color:#66d9ef">BY</span> ProductId
+</span></span><span style="display:flex;"><span>        )
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">FROM</span> <span style="color:#e6db74">&#34;Order&#34;</span> <span style="color:#66d9ef">as</span> o
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">JOIN</span> OrderDetail <span style="color:#66d9ef">as</span> od <span style="color:#66d9ef">ON</span> o.id <span style="color:#f92672">=</span> od.OrderId
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">JOIN</span> Product <span style="color:#66d9ef">as</span> p <span style="color:#66d9ef">ON</span> od.ProductId <span style="color:#f92672">=</span> p.Id
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">JOIN</span> Customer <span style="color:#66d9ef">as</span> <span style="color:#66d9ef">c</span> <span style="color:#66d9ef">ON</span> <span style="color:#66d9ef">c</span>.id <span style="color:#f92672">=</span> o.CustomerId
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">WHERE</span> julianday(substr(OrderDate, <span style="color:#ae81ff">0</span>, instr(OrderDate, <span style="color:#e6db74">&#34; &#34;</span>)))
+</span></span><span style="display:flex;"><span>     <span style="color:#f92672">=</span> julianday(<span style="color:#e6db74">&#39;2014-12-25&#39;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">AND</span> CompanyName <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Queen Cozinha&#39;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">ORDER</span> <span style="color:#66d9ef">BY</span> ProductId
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> productNames
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- here we are using julianday to get the day
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- order which are made on the required day
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- and were are selecting only the required companyName
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- and ordering the orders according to their productId
+</span></span></span></code></pre></div><p>i am still trying to wrap my head around the recursion in SQL, so my 10th answer is incomplete,</p>
+<p>here are some sources that help me complete this assignment</p>
+<p><a href="https://www.sqlitetutorial.net/">https://www.sqlitetutorial.net/</a></p>
+<p><a href="https://www.youtube.com/@AlexTheAnalyst">https://www.youtube.com/@AlexTheAnalyst</a></p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="http://localhost:1313/tags/database/">Database</a></li>
+      <li><a href="http://localhost:1313/tags/sql/">Sql</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="http://localhost:1313/posts/internet/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>internet basics</span>
+  </a>
+  <a class="next" href="http://localhost:1313/posts/learn-go-with-tests/">
+    <span class="title">Next »</span>
+    <br>
+    <span>learn go with tests</span>
+  </a>
+</nav>
+
+
+<ul class="share-buttons">
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Intro to Database Systems on x"
+            href="https://x.com/intent/tweet/?text=Intro%20to%20Database%20Systems&amp;url=http%3a%2f%2flocalhost%3a1313%2fposts%2f2024-5-7-database-systems-1%2f&amp;hashtags=database%2csql">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M512 62.554 L 512 449.446 C 512 483.97 483.97 512 449.446 512 L 62.554 512 C 28.03 512 0 483.97 0 449.446 L 0 62.554 C 0 28.03 28.029 0 62.554 0 L 449.446 0 C 483.971 0 512 28.03 512 62.554 Z M 269.951 190.75 L 182.567 75.216 L 56 75.216 L 207.216 272.95 L 63.9 436.783 L 125.266 436.783 L 235.9 310.383 L 332.567 436.783 L 456 436.783 L 298.367 228.367 L 432.367 75.216 L 371.033 75.216 Z M 127.633 110 L 164.101 110 L 383.481 400.065 L 349.5 400.065 Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Intro to Database Systems on linkedin"
+            href="https://www.linkedin.com/shareArticle?mini=true&amp;url=http%3a%2f%2flocalhost%3a1313%2fposts%2f2024-5-7-database-systems-1%2f&amp;title=Intro%20to%20Database%20Systems&amp;summary=Intro%20to%20Database%20Systems&amp;source=http%3a%2f%2flocalhost%3a1313%2fposts%2f2024-5-7-database-systems-1%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-288.985,423.278l0,-225.717l-75.04,0l0,225.717l75.04,0Zm270.539,0l0,-129.439c0,-69.333 -37.018,-101.586 -86.381,-101.586c-39.804,0 -57.634,21.891 -67.617,37.266l0,-31.958l-75.021,0c0.995,21.181 0,225.717 0,225.717l75.02,0l0,-126.056c0,-6.748 0.486,-13.492 2.474,-18.315c5.414,-13.475 17.767,-27.434 38.494,-27.434c27.135,0 38.007,20.707 38.007,51.037l0,120.768l75.024,0Zm-307.552,-334.556c-25.674,0 -42.448,16.879 -42.448,39.002c0,21.658 16.264,39.002 41.455,39.002l0.484,0c26.165,0 42.452,-17.344 42.452,-39.002c-0.485,-22.092 -16.241,-38.954 -41.943,-39.002Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Intro to Database Systems on reddit"
+            href="https://reddit.com/submit?url=http%3a%2f%2flocalhost%3a1313%2fposts%2f2024-5-7-database-systems-1%2f&title=Intro%20to%20Database%20Systems">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-3.446,265.638c0,-22.964 -18.616,-41.58 -41.58,-41.58c-11.211,0 -21.361,4.457 -28.841,11.666c-28.424,-20.508 -67.586,-33.757 -111.204,-35.278l18.941,-89.121l61.884,13.157c0.756,15.734 13.642,28.29 29.56,28.29c16.407,0 29.706,-13.299 29.706,-29.701c0,-16.403 -13.299,-29.702 -29.706,-29.702c-11.666,0 -21.657,6.792 -26.515,16.578l-69.105,-14.69c-1.922,-0.418 -3.939,-0.042 -5.585,1.036c-1.658,1.073 -2.811,2.761 -3.224,4.686l-21.152,99.438c-44.258,1.228 -84.046,14.494 -112.837,35.232c-7.468,-7.164 -17.589,-11.591 -28.757,-11.591c-22.965,0 -41.585,18.616 -41.585,41.58c0,16.896 10.095,31.41 24.568,37.918c-0.639,4.135 -0.99,8.328 -0.99,12.576c0,63.977 74.469,115.836 166.33,115.836c91.861,0 166.334,-51.859 166.334,-115.836c0,-4.218 -0.347,-8.387 -0.977,-12.493c14.564,-6.47 24.735,-21.034 24.735,-38.001Zm-119.474,108.193c-20.27,20.241 -59.115,21.816 -70.534,21.816c-11.428,0 -50.277,-1.575 -70.522,-21.82c-3.007,-3.008 -3.007,-7.882 0,-10.889c3.003,-2.999 7.882,-3.003 10.885,0c12.777,12.781 40.11,17.317 59.637,17.317c19.522,0 46.86,-4.536 59.657,-17.321c3.016,-2.999 7.886,-2.995 10.885,0.008c3.008,3.011 3.003,7.882 -0.008,10.889Zm-5.23,-48.781c-16.373,0 -29.701,-13.324 -29.701,-29.698c0,-16.381 13.328,-29.714 29.701,-29.714c16.378,0 29.706,13.333 29.706,29.714c0,16.374 -13.328,29.698 -29.706,29.698Zm-160.386,-29.702c0,-16.381 13.328,-29.71 29.714,-29.71c16.369,0 29.689,13.329 29.689,29.71c0,16.373 -13.32,29.693 -29.689,29.693c-16.386,0 -29.714,-13.32 -29.714,-29.693Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Intro to Database Systems on facebook"
+            href="https://facebook.com/sharer/sharer.php?u=http%3a%2f%2flocalhost%3a1313%2fposts%2f2024-5-7-database-systems-1%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-106.468,0l0,-192.915l66.6,0l12.672,-82.621l-79.272,0l0,-53.617c0,-22.603 11.073,-44.636 46.58,-44.636l36.042,0l0,-70.34c0,0 -32.71,-5.582 -63.982,-5.582c-65.288,0 -107.96,39.569 -107.96,111.204l0,62.971l-72.573,0l0,82.621l72.573,0l0,192.915l-191.104,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Intro to Database Systems on whatsapp"
+            href="https://api.whatsapp.com/send?text=Intro%20to%20Database%20Systems%20-%20http%3a%2f%2flocalhost%3a1313%2fposts%2f2024-5-7-database-systems-1%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-58.673,127.703c-33.842,-33.881 -78.847,-52.548 -126.798,-52.568c-98.799,0 -179.21,80.405 -179.249,179.234c-0.013,31.593 8.241,62.428 23.927,89.612l-25.429,92.884l95.021,-24.925c26.181,14.28 55.659,21.807 85.658,21.816l0.074,0c98.789,0 179.206,-80.413 179.247,-179.243c0.018,-47.895 -18.61,-92.93 -52.451,-126.81Zm-126.797,275.782l-0.06,0c-26.734,-0.01 -52.954,-7.193 -75.828,-20.767l-5.441,-3.229l-56.386,14.792l15.05,-54.977l-3.542,-5.637c-14.913,-23.72 -22.791,-51.136 -22.779,-79.287c0.033,-82.142 66.867,-148.971 149.046,-148.971c39.793,0.014 77.199,15.531 105.329,43.692c28.128,28.16 43.609,65.592 43.594,105.4c-0.034,82.149 -66.866,148.983 -148.983,148.984Zm81.721,-111.581c-4.479,-2.242 -26.499,-13.075 -30.604,-14.571c-4.105,-1.495 -7.091,-2.241 -10.077,2.241c-2.986,4.483 -11.569,14.572 -14.182,17.562c-2.612,2.988 -5.225,3.364 -9.703,1.12c-4.479,-2.241 -18.91,-6.97 -36.017,-22.23c-13.314,-11.876 -22.304,-26.542 -24.916,-31.026c-2.612,-4.484 -0.279,-6.908 1.963,-9.14c2.016,-2.007 4.48,-5.232 6.719,-7.847c2.24,-2.615 2.986,-4.484 4.479,-7.472c1.493,-2.99 0.747,-5.604 -0.374,-7.846c-1.119,-2.241 -10.077,-24.288 -13.809,-33.256c-3.635,-8.733 -7.327,-7.55 -10.077,-7.688c-2.609,-0.13 -5.598,-0.158 -8.583,-0.158c-2.986,0 -7.839,1.121 -11.944,5.604c-4.105,4.484 -15.675,15.32 -15.675,37.364c0,22.046 16.048,43.342 18.287,46.332c2.24,2.99 31.582,48.227 76.511,67.627c10.685,4.615 19.028,7.371 25.533,9.434c10.728,3.41 20.492,2.929 28.209,1.775c8.605,-1.285 26.499,-10.833 30.231,-21.295c3.732,-10.464 3.732,-19.431 2.612,-21.298c-1.119,-1.869 -4.105,-2.99 -8.583,-5.232Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Intro to Database Systems on telegram"
+            href="https://telegram.me/share/url?text=Intro%20to%20Database%20Systems&amp;url=http%3a%2f%2flocalhost%3a1313%2fposts%2f2024-5-7-database-systems-1%2f">
+            <svg version="1.1" xml:space="preserve" viewBox="2 2 28 28" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M26.49,29.86H5.5a3.37,3.37,0,0,1-2.47-1,3.35,3.35,0,0,1-1-2.47V5.48A3.36,3.36,0,0,1,3,3,3.37,3.37,0,0,1,5.5,2h21A3.38,3.38,0,0,1,29,3a3.36,3.36,0,0,1,1,2.46V26.37a3.35,3.35,0,0,1-1,2.47A3.38,3.38,0,0,1,26.49,29.86Zm-5.38-6.71a.79.79,0,0,0,.85-.66L24.73,9.24a.55.55,0,0,0-.18-.46.62.62,0,0,0-.41-.17q-.08,0-16.53,6.11a.59.59,0,0,0-.41.59.57.57,0,0,0,.43.52l4,1.24,1.61,4.83a.62.62,0,0,0,.63.43.56.56,0,0,0,.4-.17L16.54,20l4.09,3A.9.9,0,0,0,21.11,23.15ZM13.8,20.71l-1.21-4q8.72-5.55,8.78-5.55c.15,0,.23,0,.23.16a.18.18,0,0,1,0,.06s-2.51,2.3-7.52,6.8Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Intro to Database Systems on ycombinator"
+            href="https://news.ycombinator.com/submitlink?t=Intro%20to%20Database%20Systems&u=http%3a%2f%2flocalhost%3a1313%2fposts%2f2024-5-7-database-systems-1%2f">
+            <svg version="1.1" xml:space="preserve" width="30px" height="30px" viewBox="0 0 512 512" fill="currentColor"
+                xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape">
+                <path
+                    d="M449.446 0C483.971 0 512 28.03 512 62.554L512 449.446C512 483.97 483.97 512 449.446 512L62.554 512C28.03 512 0 483.97 0 449.446L0 62.554C0 28.03 28.029 0 62.554 0L449.446 0ZM183.8767 87.9921H121.8427L230.6673 292.4508V424.0079H281.3328V292.4508L390.1575 87.9921H328.1233L256 238.2489z" />
+            </svg>
+        </a>
+    </li>
+</ul>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2024 <a href="http://localhost:1313/">Sanjay&#39;s Blog</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
