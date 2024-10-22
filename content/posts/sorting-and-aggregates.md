@@ -1,6 +1,7 @@
 ---
 title: "Sorting and Aggregates"
 date: 2024-10-21
+math: true
 ---
 
 # Sorting and Aggregates
