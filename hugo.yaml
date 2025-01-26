@@ -2,6 +2,7 @@ baseURL: https://blog.sanjayj.dev/
 languageCode: en-us
 title: Sanjay's Blog
 theme: ["PaperMod"]
+googleAnalytics: "G-M5Y3YNK58R"
 
 menu:
   main:
