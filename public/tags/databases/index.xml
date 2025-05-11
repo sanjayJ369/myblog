@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Databases on Sanjay&#39;s Blog</title>
+    <link>http://localhost:1313/tags/databases/</link>
+    <description>Recent content in Databases on Sanjay&#39;s Blog</description>
+    <generator>Hugo -- 0.123.7</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 11 May 2025 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/databases/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Map Reduce</title>
+      <link>http://localhost:1313/posts/map-reduce/</link>
+      <pubDate>Sun, 11 May 2025 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/map-reduce/</guid>
+      <description>Map-Reduce Before getting into MapReduce, let’s first understand what distributed systems are — and why they’re widely used.
+Imagine You have some work that can be done by a computer. What do you do? Easy — you just assign the work to your computer. Now the work gets harder, and it’s taking longer to complete. What do you do? Simple — buy a better CPU, GPU, more RAM. Upgrade your computer.</description>
+    </item>
+  </channel>
+</rss>

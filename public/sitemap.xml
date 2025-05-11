@@ -2,11 +2,44 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
+    <loc>http://localhost:1313/categories/</loc>
+    <lastmod>2025-05-11T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/tags/databases/</loc>
+    <lastmod>2025-05-11T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/categories/databases/</loc>
+    <lastmod>2025-05-11T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/tags/distributed/</loc>
+    <lastmod>2025-05-11T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/tags/learn/</loc>
+    <lastmod>2025-05-11T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/posts/map-reduce/</loc>
+    <lastmod>2025-05-11T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>http://localhost:1313/posts/</loc>
-    <lastmod>2024-10-21T00:00:00+00:00</lastmod>
+    <lastmod>2025-05-11T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/</loc>
-    <lastmod>2024-10-21T00:00:00+00:00</lastmod>
+    <lastmod>2025-05-11T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/tags/</loc>
+    <lastmod>2025-05-11T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/tags/project/</loc>
+    <lastmod>2025-02-19T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/categories/project/</loc>
+    <lastmod>2025-02-19T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/tags/schedule-tracker/</loc>
+    <lastmod>2025-02-19T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/posts/schedule-tracker/</loc>
+    <lastmod>2025-02-19T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/posts/sorting-and-aggregates/</loc>
     <lastmod>2024-10-21T00:00:00+00:00</lastmod>
@@ -14,19 +47,10 @@
     <loc>http://localhost:1313/categories/blog/</loc>
     <lastmod>2024-07-17T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/categories/</loc>
-    <lastmod>2024-07-17T00:00:00+00:00</lastmod>
-  </url><url>
     <loc>http://localhost:1313/tags/database/</loc>
     <lastmod>2024-07-17T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/posts/index-concurrency/</loc>
-    <lastmod>2024-07-17T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>http://localhost:1313/tags/learn/</loc>
-    <lastmod>2024-07-17T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>http://localhost:1313/tags/</loc>
     <lastmod>2024-07-17T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/posts/tree-indices/</loc>
@@ -48,9 +72,6 @@
     <lastmod>2024-04-10T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/tags/network/</loc>
-    <lastmod>2024-04-10T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>http://localhost:1313/tags/project/</loc>
     <lastmod>2024-04-10T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/posts/webhook-tester/</loc>

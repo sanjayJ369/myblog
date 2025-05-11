@@ -4,7 +4,7 @@
 <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="robots" content="noindex, nofollow">
+<meta name="robots" content="index, follow">
 <title>WebHook Tester | Sanjay&#39;s Blog</title>
 <meta name="keywords" content="go, network, project">
 <meta name="description" content="What is a webhook?
@@ -62,6 +62,81 @@ Consider GitHub as an example. When a push event occurs (which is a webhook even
 
     </style>
 </noscript>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-M5Y3YNK58R"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-M5Y3YNK58R', { 'anonymize_ip': false });
+}
+</script>
+<meta property="og:title" content="WebHook Tester" />
+<meta property="og:description" content="What is a webhook?
+A webhook is an HTTP POST request that is made when a change or event happens in a system. For example, this could occur when the system starts, stops, or when certain conditions are met. This HTTP POST request contains information regarding the change, which programmers can use to initiate actions.
+Consider GitHub as an example. When a push event occurs (which is a webhook event), GitHub sends a POST request to the payload URL." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/posts/webhook-tester/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2024-04-10T00:00:00+00:00" />
+<meta property="article:modified_time" content="2024-04-10T00:00:00+00:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="WebHook Tester"/>
+<meta name="twitter:description" content="What is a webhook?
+A webhook is an HTTP POST request that is made when a change or event happens in a system. For example, this could occur when the system starts, stops, or when certain conditions are met. This HTTP POST request contains information regarding the change, which programmers can use to initiate actions.
+Consider GitHub as an example. When a push event occurs (which is a webhook event), GitHub sends a POST request to the payload URL."/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "http://localhost:1313/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "WebHook Tester",
+      "item": "http://localhost:1313/posts/webhook-tester/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "WebHook Tester",
+  "name": "WebHook Tester",
+  "description": "What is a webhook?\nA webhook is an HTTP POST request that is made when a change or event happens in a system. For example, this could occur when the system starts, stops, or when certain conditions are met. This HTTP POST request contains information regarding the change, which programmers can use to initiate actions.\nConsider GitHub as an example. When a push event occurs (which is a webhook event), GitHub sends a POST request to the payload URL.",
+  "keywords": [
+    "go", "network", "project"
+  ],
+  "articleBody": "What is a webhook?\nA webhook is an HTTP POST request that is made when a change or event happens in a system. For example, this could occur when the system starts, stops, or when certain conditions are met. This HTTP POST request contains information regarding the change, which programmers can use to initiate actions.\nConsider GitHub as an example. When a push event occurs (which is a webhook event), GitHub sends a POST request to the payload URL. This request contains the required information.\nWhat is a webhook tester?\nAs you saw with GitHub, it needs a “payload URL” to send the POST request to. This payload URL must be publicly available. If you’re building a program that receives POST requests and performs actions based on them, it needs to be able to receive the request first. To achieve this, you’d typically need a publicly available URL. However, if you’re just starting development, you might not want to purchase your own domain. This is where a webhook tester comes in. A webhook tester provides a temporary URL that you can use during development, eliminating the need to set up your own domain.\nWebhook Tester Design\nI am building a webhook tester using Golang. Here’s an overview of how it works:\nThere are two main parts: a server and a client, referred to as whserver and whclient, respectively. The whclient program is used by someone who is developing a program (program A) that performs an action when it receives a webhook POST request. Whclient is a binary file that runs on a client machine. It takes the port number as an argument, which is the port on which program A is running. When the client runs the binary file, it generates a random URL that is publicly available. This URL can be used as a payload URL to which the POST request can be made. The whserver listens for the POST request. Upon receiving it, the server encodes the request and transmits it to the whclient through a WebSocket connection. This WebSocket connection is established when the whclient binary file is initially run. The whclient rebuilds the request and makes the same request to the locally running program, simulating as if program A received the request directly. How it Works\nThere are three main packages: CLI (command-line interface), server, and serialize.\nServer Package\nThe server has two main functions:\nForwarding the received HTTP POST request to the corresponding client. Adding new clients. Adding New Clients\nThis is done using a type called subdomains, which is a map that maps a URL to an HTTP handler function. The key is the URL, and the value is the handler function.\nWhen the client binary makes a request to the /ws endpoint, the NewWebHookHandler is used to create a new mux (multiplexer). When a new request is received at the /ws endpoint, a new WebSocket connection is created between the client and the server, and a new random URL is generated. Then, the AddNewClient(u string, ws *websocket.Conn) method is called. Here, u is the randomly generated URL, and ws is a pointer to the established WebSocket connection.\nThe AddNewClient function creates a new handler function that uses the ws connection to send messages to the client. It also creates a new entry in subdomains. This establishes a WebSocket connection with the client, associates a randomly generated URL with it, and creates a handler function to communicate with the client.\nForwarding Messages to Clients\nWhen the server receives any POST request at the root endpoint, it calls the ServeHTTP function, which is a method of subdomains. This gives the server access to the URLs and corresponding client handlers. The ServeHTTP method of the subdomains type iterates through the URLs one by one and checks if the received request’s URL matches any of them. If a match is found, it calls the corresponding handler function, which encodes the received request and sends it to the client through the WebSocket connection. This way, the client receives the HTTP request.\nCLI Package\nThe client has two main purposes:\nEstablishing a WebSocket connection with the server and displaying the URL received from the server. Making the same request to the locally running program. The client is primarily built around the client structure.\nClient Structure\ntype client struct { URL string Conn *websocket.Conn httpClient *http.Client } The client structure defines the following fields:\nURL: This string stores the URL generated by the server. Conn: This pointer holds the established WebSocket connection with the server. httpClient: This is used to make HTTP requests to the local program. Client Functionality\nThe client establishes a WebSocket connection with the server by calling the NewConn function:\nfunc NewConn(wsLink string) *websocket.Conn { ws, _, err := websocket.DefaultDialer.Dial(wsLink, nil) if err != nil { log.Fatalf(\"error establishing websocket connection: %v\", err.Error()) } return ws } This function attempts to connect to the provided URL (wsLink) and returns a pointer to the established WebSocket connection (ws). If an error occurs during connection establishment, it’s logged using log.Fatalf.\nOnce connected, the client retrieves the generated URL from the WebSocket connection and creates a new http.Client instance. Finally, it enters a loop to listen for incoming messages on the WebSocket connection using the Listen method:\nfunc (c *client) Listen(w io.Writer, fields []string, urlstr string) error { data, msgType, err := read(c.Conn) if err != nil { return err } if msgType == websocket.TextMessage { fmt.Fprint(w, \"\\n\"+string(data)) } else if msgType == websocket.BinaryMessage { req := serialize.DecodeRequest(data) fmt.Fprint(w, readRequestFields(fields, *req)) req.URL, _ = url.Parse(urlstr) req.RequestURI = \"\" _, err := c.httpClient.Do(req) // Send the decoded request to the local program if err != nil { log.Fatalf(\"\\ncli could not forward message to local server: %v\", err) } } return nil } The Listen method first reads data, message type, and any potential errors from the connection. It then handles different message types, on receiving a binary message it decodes it, and makes the same request to the locally running program\n",
+  "wordCount" : "999",
+  "inLanguage": "en",
+  "datePublished": "2024-04-10T00:00:00Z",
+  "dateModified": "2024-04-10T00:00:00Z",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "http://localhost:1313/posts/webhook-tester/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Sanjay's Blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "http://localhost:1313/favicon.webp"
+    }
+  }
+}
+</script>
 </head>
 
 <body class="" id="top">
@@ -315,7 +390,7 @@ Consider GitHub as an example. When a push event occurs (which is a webhook even
     </main>
     
 <footer class="footer">
-        <span>&copy; 2024 <a href="http://localhost:1313/">Sanjay&#39;s Blog</a></span> · 
+        <span>&copy; 2025 <a href="http://localhost:1313/">Sanjay&#39;s Blog</a></span> · 
 
     <span>
         Powered by

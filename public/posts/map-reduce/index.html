@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Map Reduce | Sanjay&#39;s Blog</title>
+<meta name="keywords" content="learn, distributed, databases">
+<meta name="description" content="Map-Reduce Before getting into MapReduce, let’s first understand what distributed systems are — and why they’re widely used.
+Imagine You have some work that can be done by a computer. What do you do? Easy — you just assign the work to your computer. Now the work gets harder, and it’s taking longer to complete. What do you do? Simple — buy a better CPU, GPU, more RAM. Upgrade your computer.">
+<meta name="author" content="">
+<link rel="canonical" href="http://localhost:1313/posts/map-reduce/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.fc220c15db4aef0318bbf30adc45d33d4d7c88deff3238b23eb255afdc472ca6.css" integrity="sha256-/CIMFdtK7wMYu/MK3EXTPU18iN7/MjiyPrJVr9xHLKY=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/favicon.webp">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/posts/map-reduce/">
+
+<script>
+    console.log("differe head is being loaded")
+</script>
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-M5Y3YNK58R"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-M5Y3YNK58R', { 'anonymize_ip': false });
+}
+</script>
+<meta property="og:title" content="Map Reduce" />
+<meta property="og:description" content="Map-Reduce Before getting into MapReduce, let’s first understand what distributed systems are — and why they’re widely used.
+Imagine You have some work that can be done by a computer. What do you do? Easy — you just assign the work to your computer. Now the work gets harder, and it’s taking longer to complete. What do you do? Simple — buy a better CPU, GPU, more RAM. Upgrade your computer." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/posts/map-reduce/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2025-05-11T00:00:00+00:00" />
+<meta property="article:modified_time" content="2025-05-11T00:00:00+00:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Map Reduce"/>
+<meta name="twitter:description" content="Map-Reduce Before getting into MapReduce, let’s first understand what distributed systems are — and why they’re widely used.
+Imagine You have some work that can be done by a computer. What do you do? Easy — you just assign the work to your computer. Now the work gets harder, and it’s taking longer to complete. What do you do? Simple — buy a better CPU, GPU, more RAM. Upgrade your computer."/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "http://localhost:1313/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Map Reduce",
+      "item": "http://localhost:1313/posts/map-reduce/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Map Reduce",
+  "name": "Map Reduce",
+  "description": "Map-Reduce Before getting into MapReduce, let’s first understand what distributed systems are — and why they’re widely used.\nImagine You have some work that can be done by a computer. What do you do? Easy — you just assign the work to your computer. Now the work gets harder, and it’s taking longer to complete. What do you do? Simple — buy a better CPU, GPU, more RAM. Upgrade your computer.",
+  "keywords": [
+    "learn", "distributed", "databases"
+  ],
+  "articleBody": "Map-Reduce Before getting into MapReduce, let’s first understand what distributed systems are — and why they’re widely used.\nImagine You have some work that can be done by a computer. What do you do? Easy — you just assign the work to your computer. Now the work gets harder, and it’s taking longer to complete. What do you do? Simple — buy a better CPU, GPU, more RAM. Upgrade your computer. That’s awesome. But then the work gets even harder. What now? You upgrade again — even better CPU, GPU, and RAM. Now you’re running the latest, top-notch machine. You’ve maxed out how strong your computer can be. But the work keeps growing. It takes more time again. And now, you can’t make your computer any stronger. Looks like we’ve hit a wall, right? Actually… no. What if we make two computers do the work? Hmmmm. And if the work grows again? Just add two more computers. Then four. Then ten. This is called horizontal scaling — adding more machines instead of upgrading just one. And when multiple computers work together on a problem, we call that a distributed system.\nSo what is MapReduce, and how does it fit into distributed systems?\nThink of MapReduce as a ninja technique that helps us split up work across multiple computers and stitch the results back together — all while making the process faster and more efficient.\nLet’s break it down with an example.\nThe Problem: Sum of Numbers Across Multiple Computers\nImagine you have 10 computers, and each stores 100 numbers.\nComputer 1: numbers 1–100 Computer 2: numbers 101–200 … and so on. Now, you want to compute the sum of all 1,000 numbers.\nNaive Approach: You let one computer do the work. It asks the other 9 for their numbers over the network.\nIf it takes:\n1 second to add two numbers 0.1 second to fetch a number from another computer 0 seconds if the number is already local Here’s the catch:\nOnly 100 numbers are local. The remaining 900 need to be fetched.\nFirst 99 additions (local): 99 seconds Next 900 additions (remote): 900 × (1 + 0.1) = 990 seconds Total time: 99 + 990 = 1,089 seconds\nThat’s sloooow.\nMapReduce-Style Approach: Now, What if each computer adds up its own 100 numbers in parallel?\nComputer 1: sum = 5050 Computer 2: sum = 15050 Computer 3: sum = 25050 … and so on. Each computer performs 99 additions locally (no network delay).\nTime taken per computer: 99 seconds\nOnce done, they send their 10 partial results to Computer 1.\nSending 9 results: 9 × 0.1 = 0.9 seconds Final 9 additions: 9 seconds Total time: 99 + 0.9 + 9 = ~108.9 seconds\nThat’s 10 times faster!\nAs you can see, the MapReduce style has two key phases:\nThe phase where each computer adds up the numbers that are local to it — this is called the Map Phase. The phase where all computers send their local results to one computer for the final showdown — this is the Reduce Phase. Now let’s get into the technical details of how map reduce actually work…!!! master, preprocess and create tasks map tasks, reduce tasks, workers ask for tasks send results to master, fault tolerance,\nNow, let’s dive into some technical details of how MapReduce is actually implemented.\nHow does MapReduce work? Imagine you own a massive digital library with 100 terabytes of .txt files distributed across 10 computers.\nYour task is to count how many times a particular word appears across all the books.\nTo do this efficiently, you can use MapReduce. But before we get started, we need to define two functions: the Map function and the Reduce function.\nWhat is a Map Function?\nThe Map function takes a portion of the text and maps it into key-value pairs. These key-value pairs are also known as intermediate key-value pair\nNow, what exactly should the Map function do?\nIt will break down a chunk of text (from one of the files) and produce a key-value pair for each word in that text. The key will be the word itself. The value will always be 1 (because we’re just counting the occurrences of each word). So, if the word “dog” appears 2 times in a particular block of text, the Map function will output:\nKey: “dog”, Value: 1 (for each occurrence). What is a Reduce Function?\nIt takes all key-value pairs that share the same key and combines them into a single result.\nFor instance, if we have many key-value pairs for the word “dog”, like: “dog” → 1 “dog” → 1 “dog” → 1 “dog” → 1 The Reduce function will combine these values and output a single pair:\nKey: “dog”, Value: 4 (the total count of the word “dog” across all the chunks). How Does MapReduce Work in Practice? Now that we have our Map and Reduce functions, let’s look at how MapReduce actually runs in a distributed system to give us the results we want.\nFor simplicity, let’s assume the master and reducers are separate computers. But in reality, the workers themselves perform the reduce tasks, and the master is only responsible for task assignment and monitoring.\nThe Master and Worker Computers\nIn a MapReduce system, we have two types of computers:\nMaster Computer: The job of the master is to assign tasks to the worker computers. Worker Computers: These are the machines that actually process the data and perform the work, running the Map and Reduce functions. But how does the master know which task to assign to which worker? Here’s where things get clever.\nTask Assignment and File Distribution Each worker computer needs to access the data stored on the network, but if the required file is not on the computer, it would need to fetch it from another machine. Network transfer is slow, so we want to minimize this delay.\nThe Master Computer is smart. It knows exactly where the data is stored and assigns tasks so that, as much as possible, the worker computers can access the required data locally, without the need for network transfers.\nExample: File Distribution: The master knows which files are stored on which computers. For instance: Computer 1 stores files 1, 2, 3, 5, 7. Computer 2 stores files 6, 8, 9, 10, 11 and so on …. The Preprocessing Step Before assigning tasks, the master computer pre-processes the files and splits them into map tasks. The size of each map task is typically between 16MB to 64MB.\nhere the pre-processing does not include reading the entire file, it mostly only processes the meta data like the size of the file.\nThese map tasks are chunks of the files that can be processed independently.\nTask Assignment to Workers Let’s say that the master needs to assign a task to Computer 1. If Computer 1 has File 1, the master will assign Map Task 1, which corresponds to part of File 1.\nHere’s how the tasks might be split:\nFile 1 is split into Map Tasks 1, 2, 3, … File 2 is split into Map Tasks 12, 13, 14, … If Computer 1 requests a task, the master will likely assign it Map Tasks 1, 2, and 3, since File 1 is stored on Computer 1. Similarly, if Computer 2 requests a task, the master will assign it Map Tasks 12, 13, and 14, as those tasks correspond to File 2, which is stored on Computer 2.\nHow are Map Tasks Processed Map Phase The map and reduce functions are distributed to all worker computers by the master. So, every worker has a copy of these functions.\nWhen a worker receives a map task, it reads its assigned chunk of the input file and applies the map function to it. This produces a set of key-value pairs. These key-value pairs are also known as intermediate key-value pairs.\nBut instead of storing all the key-value pairs in one place, the worker partitions them into R intermediate buckets — where R is the number of reduce tasks.\nEach bucket contains a subset of the key-value pairs. The partitioning is usually done based on the key — often using a hash function, like:\nbucket_number = hash(key) % R This ensures that:\nAll values for the same key always go to the same bucket, and Each reduce task will receive one bucket from every map worker, containing all the key-value pairs it needs to process. Map to Reduce Transition In this example, we have 3 reducers, so the output from each map function is split into 3 separate reduce buckets — one for each reducer.\nEach worker processes multiple map tasks, and each task produces key-value pairs. These key-value pairs are partitioned into three buckets, indicated by red, green, and blue in this example.\nWhen a map task finishes, its intermediate results are stored in these buckets. The addresses (locations) of the buckets are then sent to the master — not the actual data.\nThink of it like passing around pointers or references to the data — not the data itself.\nReduce Phase Now it’s time for the reducers to step in.\nThe master now holds the addresses of all the intermediate results from the completed map tasks.\nDon’t get confused by the visuals — each bucket shown here just represents the location of the data, not the data itself.\nwe have three reducers and master with addresses of all the results we got from computing map tasks.\nEach reducer is assigned all the buckets of a specific color (or partition):\nReducer 1 gets all red buckets, Reducer 2 gets all green buckets, Reducer 3 gets all blue buckets. Let’s zoom into Reducer 1 to see what it does:\nReducer 1 now fetches all the actual data from the bucket addresses it received. Since this involves data transfer over the network, it can be a bit slow.\nOnce Reducer 1 collects all key-value pairs with the same key, it runs the reduce function on them and writes the final output to a file.\nThis same process happens in parallel for Reducers 2 and 3.\nOnce all reducers finish it’s DONE!\nSorting Example now let’s see how sorting works using map reduce. the sorting confused me a bit, because i was thinking of memory constrains during the reduce phase. for the sorting to be done you must have enough space in your reducer to stored the output. in sorting the data is not moved around but the copy of the data is moved. so if the size of the data to be sorted is N we must have extra N free space left to store the result.\nsorting algorithms like external merge sort and external M-way merge are used to sort and merge the data that does not fit in memory.\nsay you have 10 numbers range between 1-100 in 10 computer that must be sorted and you have 2 reducer. and partitioning of the intermediate keys is done using the following:\nif number \u003c= 50 { // bucket-1 } else { // bucket-2 } here is how the state of the computers currently look like.\nnow the workers are assigned map tasks and the numbers are sorted locally, for simplicity let’s assume each worker is assigned a single map task and the map task contains includes all the numbers present in the worker.\nnow the numbers are sorted locally within the worker. here is current state of the workers.\nnow it’s time for the reduce phase, as discussed before the workers will send back the master computer the addresses of the intermediate buckets, these addresses are sent to the reducers.\nlet’s zoom into the working of the reducer 1, here the reducer fetches all the buckets, and performs m-way merge, if the data is too large, it streams the data from the worker so that it’s not overloaded. and if the data is too large to fit into memory it performs m-way external merge.\nand similarly reducer 2 performs the reduce task and finally we get two output files containing numbers in the sorted order, remember these are just copy of the original number that are in the computers.\nSome Interesting Stuff Now that we’ve gone through how MapReduce works conceptually, let’s get into a practical bit — my implementation of file splitting for MapReduce. This is part of my solution for Lab 1 of the MIT 6.5840 course.\nHere, I’ll talk about one interesting challenge: splitting a file into chunks that preserve full lines.\nThe Problem: Chunking Without Breaking Lines Let’s say we have a file with 5 lines.\nIf we naively split it into fixed-size chunks, it might look like this:\nAs you can see, the line \"they play outside.\" is split between two chunks. The character 'T' is in chunk 2, while the rest is in chunk 3.\nThis is problematic because I wanted each map task to be able to process the file line by line, which becomes difficult when lines are split across chunks.\nThe First (Bad) Idea 💡 At first, I thought: “Why not just read the file line by line and store those lines in tasks?”\nBut that turns out to be a really bad idea.\nWhy? Because it forces the coordinator (or master) to read the entire file — defeating the point of MapReduce, especially if you have thousands of files, each potentially gigabytes in size. This kills scalability.\nThe Right Approach Instead, we should create chunks based on metadata (like file size), without reading the file content during task creation.\n// creates list of MapTasks from chunks func createMapTasks(files []string, nReduce int) []MapTask { slogger.Info(\"Creating map tasks\", \"nReduce\", nReduce, \"files\", files) tasks := []MapTask{} for _, file := range files { chunks := createChunks(file) for _, chunk := range chunks { task := MapTask{ Id: uuid.NewString(), Chunk: chunk, NReduce: nReduce, } tasks = append(tasks, task) slogger.Info(\"Created map task\", \"taskId\", task.Id, \"file\", file) } } return tasks } // splits the file into chunks func createChunks(filename string) []Chunk { fi, err := os.Stat(filename) if err != nil { log.Fatal(\"reading file stat:\", err) } size := fi.Size() count := math.Ceil(float64(size) / float64(CHUNK_SIZE)) tasks := []Chunk{} for i := range int(count) { task := Chunk{ Filename: filename, Offset: int64(CHUNK_SIZE * i), Size: int64(CHUNK_SIZE), } tasks = append(tasks, task) } return tasks } Here, I’m using just the file size to define chunk boundaries — no content is read at this point.\nHandling Line Boundaries When Reading Now comes the tricky part: reading the chunk while ensuring we don’t break lines.\nThe logic:\nIf the last character of a chunk isn’t \\n, it means the line continues into the next chunk. So, the next chunk will skip the first line (since it was already partially included in the previous one). Additionally, the current chunk might need to grab the remaining part of the line from the next chunk. Here’s how I implemented it:\n// readChunk reads a chunk and returns full lines, handling line splits at boundaries func readChunk(task Chunk) []string { ... // Check the last byte of the previous chunk if task.Offset != 0 { prevChunkLast := make([]byte, 1) ... if prevChunkLast[0] != '\\n' { skipStart = true } } ... // Read lines using bufio.Scanner scanner := bufio.NewScanner(bytes.NewBuffer(chunk)) for scanner.Scan() { if i == 0 \u0026\u0026 skipStart { i++ continue } lines = append(lines, scanner.Text()) } // If this chunk ends in the middle of a line, grab the rest from the next chunk if checkNext { ... } return lines } This way, each map task processes only complete lines, and the coordinator doesn’t need to read entire files — staying true to the spirit of distributed processing.\n…and then I realized — the test cases were actually applying the mapf function on the entire file directly 😅.\nSo technically, I didn’t even need to split the files at all. LOL.\nIf you’re curious, you can check out my full implementation (including this chunk-splitting logic and more) here:\n👉 https://github.com/sanjayJ369/dist-db\n",
+  "wordCount" : "2677",
+  "inLanguage": "en",
+  "datePublished": "2025-05-11T00:00:00Z",
+  "dateModified": "2025-05-11T00:00:00Z",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "http://localhost:1313/posts/map-reduce/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Sanjay's Blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "http://localhost:1313/favicon.webp"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="Sanjay&#39;s Blog (Alt + H)">Sanjay&#39;s Blog</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="http://localhost:1313/archives/" title="Archives">
+                    <span>Archives</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="http://localhost:1313/">Home</a>&nbsp;»&nbsp;<a href="http://localhost:1313/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Map Reduce
+    </h1>
+    <div class="post-meta"><span title='2025-05-11 00:00:00 +0000 UTC'>May 11, 2025</span>&nbsp;·&nbsp;13 min
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#map-reduce" aria-label="Map-Reduce">Map-Reduce</a><ul>
+                        <ul>
+                        
+                <li>
+                    <a href="#naive-approach" aria-label="Naive Approach:">Naive Approach:</a></li>
+                <li>
+                    <a href="#mapreduce-style-approach" aria-label="MapReduce-Style Approach:">MapReduce-Style Approach:</a></li>
+                <li>
+                    <a href="#how-does-mapreduce-work" aria-label="How does MapReduce work?">How does MapReduce work?</a></li>
+                <li>
+                    <a href="#how-does-mapreduce-work-in-practice" aria-label="How Does MapReduce Work in Practice?">How Does MapReduce Work in Practice?</a></li>
+                <li>
+                    <a href="#task-assignment-and-file-distribution" aria-label="Task Assignment and File Distribution">Task Assignment and File Distribution</a></li>
+                <li>
+                    <a href="#example" aria-label="Example:">Example:</a></li>
+                <li>
+                    <a href="#the-preprocessing-step" aria-label="The Preprocessing Step">The Preprocessing Step</a></li>
+                <li>
+                    <a href="#task-assignment-to-workers" aria-label="Task Assignment to Workers">Task Assignment to Workers</a></li>
+                <li>
+                    <a href="#how-are-map-tasks-processed" aria-label="How are Map Tasks Processed">How are Map Tasks Processed</a></li>
+                <li>
+                    <a href="#map-phase" aria-label="Map Phase">Map Phase</a></li>
+                <li>
+                    <a href="#map-to-reduce-transition" aria-label="Map to Reduce Transition">Map to Reduce Transition</a></li>
+                <li>
+                    <a href="#reduce-phase" aria-label="Reduce Phase">Reduce Phase</a></li>
+                <li>
+                    <a href="#sorting-example" aria-label="Sorting Example">Sorting Example</a></li>
+                <li>
+                    <a href="#some-interesting-stuff" aria-label="Some Interesting Stuff">Some Interesting Stuff</a></li>
+                <li>
+                    <a href="#the-problem-chunking-without-breaking-lines" aria-label="The Problem: Chunking Without Breaking Lines">The Problem: Chunking Without Breaking Lines</a></li>
+                <li>
+                    <a href="#the-first-bad-idea-" aria-label="The First (Bad) Idea 💡">The First (Bad) Idea 💡</a></li>
+                <li>
+                    <a href="#the-right-approach" aria-label="The Right Approach">The Right Approach</a></li>
+                <li>
+                    <a href="#handling-line-boundaries-when-reading" aria-label="Handling Line Boundaries When Reading">Handling Line Boundaries When Reading</a>
+                </li>
+            </ul>
+            </ul>
+            </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><h1 id="map-reduce">Map-Reduce<a hidden class="anchor" aria-hidden="true" href="#map-reduce">#</a></h1>
+<p><strong>Before getting into MapReduce, let’s first understand what distributed systems are — and why they’re widely used.</strong></p>
+<p>Imagine You have some work that can be done by a computer. What do you do?
+Easy — you just assign the work to your computer.
+Now the work gets harder, and it’s taking longer to complete. What do you do?
+Simple — buy a better CPU, GPU, more RAM. Upgrade your computer.
+That’s awesome. But then the work gets <em>even</em> harder. What now?
+You upgrade again — even better CPU, GPU, and RAM.
+Now you’re running the latest, top-notch machine.
+You’ve maxed out how strong your computer can be.
+But the work keeps growing. It takes more time again.
+And now, you <em>can’t</em> make your computer any stronger.
+Looks like we’ve hit a wall, right?
+Actually&hellip; no.
+What if we make <em>two</em> computers do the work?
+Hmmmm. And if the work grows again?
+Just add two more computers. Then four. Then ten.
+This is called <strong>horizontal scaling</strong> — adding more machines instead of upgrading just one.
+And when multiple computers work together on a problem, we call that a <strong>distributed system</strong>.</p>
+<p><strong>So what is MapReduce, and how does it fit into distributed systems?</strong></p>
+<p>Think of <strong>MapReduce</strong> as a ninja technique that helps us split up work across multiple computers <em>and</em> stitch the results back together — all while making the process faster and more efficient.</p>
+<p>Let’s break it down with an example.</p>
+<p><strong>The Problem: Sum of Numbers Across Multiple Computers</strong></p>
+<p>Imagine you have <strong>10 computers</strong>, and each stores <strong>100 numbers</strong>.</p>
+<ul>
+<li>Computer 1: numbers 1–100</li>
+<li>Computer 2: numbers 101–200</li>
+<li>… and so on.</li>
+</ul>
+<p>Now, you want to compute the <strong>sum of all 1,000 numbers</strong>.</p>
+<h3 id="naive-approach">Naive Approach:<a hidden class="anchor" aria-hidden="true" href="#naive-approach">#</a></h3>
+<p>You let <strong>one computer</strong> do the work. It asks the other 9 for their numbers over the network.</p>
+<p>If it takes:</p>
+<ul>
+<li>1 second to add two numbers</li>
+<li>0.1 second to fetch a number from another computer</li>
+<li>0 seconds if the number is already local</li>
+</ul>
+<p>Here’s the catch:</p>
+<p>Only 100 numbers are local. The remaining 900 need to be fetched.</p>
+<ul>
+<li>First 99 additions (local): 99 seconds</li>
+<li>Next 900 additions (remote): 900 × (1 + 0.1) = <strong>990 seconds</strong></li>
+</ul>
+<p><strong>Total time: 99 + 990 = 1,089 seconds</strong></p>
+<p>That’s sloooow.</p>
+<h3 id="mapreduce-style-approach">MapReduce-Style Approach:<a hidden class="anchor" aria-hidden="true" href="#mapreduce-style-approach">#</a></h3>
+<p>Now, What if <em>each computer</em> adds up its own 100 numbers <strong>in parallel</strong>?</p>
+<ul>
+<li>Computer 1: sum = 5050</li>
+<li>Computer 2: sum = 15050</li>
+<li>Computer 3: sum = 25050</li>
+<li>… and so on.</li>
+</ul>
+<p>Each computer performs <strong>99 additions locally</strong> (no network delay).</p>
+<p>Time taken per computer: <strong>99 seconds</strong></p>
+<p>Once done, they send their <strong>10 partial results</strong> to Computer 1.</p>
+<ul>
+<li>Sending 9 results: 9 × 0.1 = <strong>0.9 seconds</strong></li>
+<li>Final 9 additions: <strong>9 seconds</strong></li>
+</ul>
+<p><strong>Total time: 99 + 0.9 + 9 = ~108.9 seconds</strong></p>
+<p>That’s <strong>10 times faster</strong>!</p>
+<p>As you can see, the MapReduce style has <strong>two key phases</strong>:</p>
+<ul>
+<li>The phase where each computer adds up the numbers that are <em>local</em> to it — this is called the <strong>Map Phase</strong>.</li>
+<li>The phase where all computers send their local results to one computer for the final showdown — this is the <strong>Reduce Phase</strong>.</li>
+</ul>
+<p>Now let’s get into the technical details of how map reduce actually work…!!!
+master, preprocess and create tasks
+map tasks, reduce tasks,
+workers ask for tasks send results to master, fault tolerance,</p>
+<p>Now, let’s dive into some technical details of how MapReduce is actually implemented.</p>
+<h3 id="how-does-mapreduce-work">How does MapReduce work?<a hidden class="anchor" aria-hidden="true" href="#how-does-mapreduce-work">#</a></h3>
+<p>Imagine you own a massive digital library with <strong>100 terabytes</strong> of .txt files distributed across <strong>10 computers</strong>.</p>
+<p>Your task is to count how many times a particular word appears across all the books.</p>
+<p>To do this efficiently, you can use <strong>MapReduce</strong>. But before we get started, we need to define two functions: the <strong>Map</strong> function and the <strong>Reduce</strong> function.</p>
+<p>What is a Map Function?</p>
+<p>The <strong>Map</strong> function takes a portion of the text and maps it into key-value pairs. These key-value pairs are also known as intermediate key-value pair</p>
+<p>Now, what exactly should the <strong>Map</strong> function do?</p>
+<ul>
+<li>It will break down a chunk of text (from one of the files) and produce a key-value pair for each word in that text.</li>
+<li>The <strong>key</strong> will be the word itself.</li>
+<li>The <strong>value</strong> will always be <strong>1</strong> (because we’re just counting the occurrences of each word).</li>
+</ul>
+<p>So, if the word &ldquo;dog&rdquo; appears 2 times in a particular block of text, the <strong>Map</strong> function will output:</p>
+<ul>
+<li><strong>Key</strong>: &ldquo;dog&rdquo;, <strong>Value</strong>: 1 (for each occurrence).</li>
+</ul>
+<p><img loading="lazy" src="/images/2025-5-11-map-reduce/image.png" alt="image.png"  />
+</p>
+<p>What is a Reduce Function?</p>
+<p>It takes all key-value pairs that share the same key and combines them into a single result.</p>
+<p><img loading="lazy" src="/images/2025-5-11-map-reduce/image%201.png" alt="image.png"  />
+</p>
+<ul>
+<li>For instance, if we have many key-value pairs for the word &ldquo;dog&rdquo;, like:
+<ul>
+<li>&ldquo;dog&rdquo; → 1</li>
+<li>&ldquo;dog&rdquo; → 1</li>
+<li>&ldquo;dog&rdquo; → 1</li>
+<li>&ldquo;dog&rdquo; → 1</li>
+</ul>
+</li>
+</ul>
+<p>The <strong>Reduce</strong> function will combine these values and output a single pair:</p>
+<ul>
+<li><strong>Key</strong>: &ldquo;dog&rdquo;, <strong>Value</strong>: 4 (the total count of the word &ldquo;dog&rdquo; across all the chunks).</li>
+</ul>
+<h3 id="how-does-mapreduce-work-in-practice">How Does MapReduce Work in Practice?<a hidden class="anchor" aria-hidden="true" href="#how-does-mapreduce-work-in-practice">#</a></h3>
+<p>Now that we have our <strong>Map</strong> and <strong>Reduce</strong> functions, let’s look at how <strong>MapReduce</strong> actually runs in a distributed system to give us the results we want.</p>
+<p>For simplicity, let’s assume the master and reducers are separate computers. But in reality, <strong>the workers themselves perform the reduce tasks</strong>, and the <strong>master is only responsible for task assignment and monitoring</strong>.</p>
+<p>The Master and Worker Computers</p>
+<p>In a MapReduce system, we have two types of computers:</p>
+<ol>
+<li><strong>Master Computer</strong>: The job of the master is to <strong>assign tasks</strong> to the worker computers.</li>
+<li><strong>Worker Computers</strong>: These are the machines that actually <strong>process the data</strong> and perform the work, running the <strong>Map</strong> and <strong>Reduce</strong> functions.</li>
+</ol>
+<p>But how does the master know which task to assign to which worker? Here’s where things get clever.</p>
+<h3 id="task-assignment-and-file-distribution">Task Assignment and File Distribution<a hidden class="anchor" aria-hidden="true" href="#task-assignment-and-file-distribution">#</a></h3>
+<p>Each worker computer needs to access the data stored on the network, but if the required file is not on the computer, it would need to fetch it from another machine. <strong>Network transfer is slow</strong>, so we want to minimize this delay.</p>
+<p><strong>The Master Computer is smart</strong>. It knows exactly where the data is stored and assigns tasks so that, as much as possible, the worker computers can access the required data locally, without the need for network transfers.</p>
+<h3 id="example">Example:<a hidden class="anchor" aria-hidden="true" href="#example">#</a></h3>
+<ul>
+<li><strong>File Distribution</strong>:
+The master knows which files are stored on which computers. For instance:
+<ul>
+<li><strong>Computer 1</strong> stores files 1, 2, 3, 5, 7.</li>
+<li><strong>Computer 2</strong> stores files 6, 8, 9, 10, 11 and so on ….</li>
+</ul>
+</li>
+</ul>
+<p><img loading="lazy" src="/images/2025-5-11-map-reduce/image%202.png" alt="image.png"  />
+</p>
+<h3 id="the-preprocessing-step">The Preprocessing Step<a hidden class="anchor" aria-hidden="true" href="#the-preprocessing-step">#</a></h3>
+<p>Before assigning tasks, the <strong>master computer</strong> pre-processes the files and <strong>splits them into map tasks</strong>. The size of each <strong>map task</strong> is typically between <strong>16MB to 64MB</strong>.</p>
+<p>here the pre-processing does not include reading the entire file, it mostly only processes the meta data like the size of the file.</p>
+<p>These <strong>map tasks</strong> are chunks of the files that can be processed independently.</p>
+<p><img loading="lazy" src="/images/2025-5-11-map-reduce/image%203.png" alt="image.png"  />
+</p>
+<h3 id="task-assignment-to-workers">Task Assignment to Workers<a hidden class="anchor" aria-hidden="true" href="#task-assignment-to-workers">#</a></h3>
+<p>Let’s say that the <strong>master</strong> needs to assign a task to <strong>Computer 1</strong>. If <strong>Computer 1</strong> has <strong>File 1</strong>, the <strong>master</strong> will assign <strong>Map Task 1</strong>, which corresponds to part of <strong>File 1</strong>.</p>
+<p>Here’s how the tasks might be split:</p>
+<ul>
+<li><strong>File 1</strong> is split into <strong>Map Tasks 1, 2, 3, &hellip;</strong></li>
+<li><strong>File 2</strong> is split into <strong>Map Tasks 12, 13, 14, &hellip;</strong></li>
+</ul>
+<p>If <strong>Computer 1</strong> requests a task, the <strong>master</strong> will likely assign it <strong>Map Tasks 1, 2, and 3</strong>, since <strong>File 1</strong> is stored on <strong>Computer 1</strong>. Similarly, if <strong>Computer 2</strong> requests a task, the <strong>master</strong> will assign it <strong>Map Tasks 12, 13, and 14</strong>, as those tasks correspond to <strong>File 2</strong>, which is stored on <strong>Computer 2</strong>.</p>
+<h3 id="how-are-map-tasks-processed">How are Map Tasks Processed<a hidden class="anchor" aria-hidden="true" href="#how-are-map-tasks-processed">#</a></h3>
+<h3 id="map-phase"><strong>Map Phase</strong><a hidden class="anchor" aria-hidden="true" href="#map-phase">#</a></h3>
+<p>The <code>map</code> and <code>reduce</code> functions are distributed to all worker computers by the master. So, every worker has a copy of these functions.</p>
+<p>When a worker receives a <strong>map task</strong>, it reads its assigned chunk of the input file and applies the <strong>map function</strong> to it. This produces a set of <strong>key-value pairs</strong>. These key-value pairs are also known as <strong>intermediate key-value pairs</strong>.</p>
+<p>But instead of storing all the key-value pairs in one place, the worker <strong>partitions</strong> them into <strong>R intermediate buckets</strong> — where <strong>R is the number of reduce tasks</strong>.</p>
+<p>Each bucket contains a subset of the key-value pairs. The partitioning is usually done based on the <strong>key</strong> — often using a hash function, like:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#a6e22e">bucket_number</span> = <span style="color:#a6e22e">hash</span>(<span style="color:#a6e22e">key</span>) <span style="color:#f92672">%</span> <span style="color:#a6e22e">R</span>
+</span></span></code></pre></div><p>This ensures that:</p>
+<ul>
+<li><strong>All values for the same key always go to the same bucket</strong>, and</li>
+<li>Each <strong>reduce task</strong> will receive <strong>one bucket from every map worker</strong>, containing all the key-value pairs it needs to process.</li>
+</ul>
+<h3 id="map-to-reduce-transition">Map to Reduce Transition<a hidden class="anchor" aria-hidden="true" href="#map-to-reduce-transition">#</a></h3>
+<p>In this example, we have <strong>3 reducers</strong>, so the output from each map function is split into <strong>3 separate reduce buckets</strong> — one for each reducer.</p>
+<p><img loading="lazy" src="/images/2025-5-11-map-reduce/image%204.png" alt="image.png"  />
+</p>
+<p>Each worker processes <strong>multiple map tasks</strong>, and each task produces key-value pairs. These key-value pairs are partitioned into <strong>three buckets</strong>, indicated by <strong>red</strong>, <strong>green</strong>, and <strong>blue</strong> in this example.</p>
+<p><img loading="lazy" src="/images/2025-5-11-map-reduce/image%205.png" alt="image.png"  />
+</p>
+<p>When a map task finishes, its intermediate results are stored in these buckets. The <strong>addresses (locations)</strong> of the buckets are then <strong>sent to the master</strong> — not the actual data.</p>
+<p><img loading="lazy" src="/images/2025-5-11-map-reduce/image%206.png" alt="image.png"  />
+</p>
+<p>Think of it like passing around <strong>pointers</strong> or references to the data — not the data itself.</p>
+<h3 id="reduce-phase">Reduce Phase<a hidden class="anchor" aria-hidden="true" href="#reduce-phase">#</a></h3>
+<p>Now it’s time for the reducers to step in.</p>
+<p>The master now holds the <strong>addresses of all the intermediate results</strong> from the completed map tasks.</p>
+<p>Don&rsquo;t get confused by the visuals — each bucket shown here just represents the <strong>location of the data</strong>, not the data itself.</p>
+<p>we have three reducers and master with addresses of all the results we got from computing map tasks.</p>
+<p><img loading="lazy" src="/images/2025-5-11-map-reduce/image%207.png" alt="image.png"  />
+</p>
+<p>Each reducer is assigned all the buckets of a specific color (or partition):</p>
+<ul>
+<li><strong>Reducer 1</strong> gets all <strong>red</strong> buckets,</li>
+<li><strong>Reducer 2</strong> gets all <strong>green</strong> buckets,</li>
+<li><strong>Reducer 3</strong> gets all <strong>blue</strong> buckets.</li>
+</ul>
+<p><img loading="lazy" src="/images/2025-5-11-map-reduce/image%208.png" alt="image.png"  />
+</p>
+<p>Let’s zoom into <strong>Reducer 1</strong> to see what it does:</p>
+<p>Reducer 1 now fetches all the <strong>actual data</strong> from the bucket addresses it received. Since this involves data transfer over the network, it can be <strong>a bit slow</strong>.</p>
+<p><img loading="lazy" src="/images/2025-5-11-map-reduce/image%209.png" alt="image.png"  />
+</p>
+<p><img loading="lazy" src="/images/2025-5-11-map-reduce/image%2010.png" alt="image.png"  />
+</p>
+<p>Once Reducer 1 collects all key-value pairs with the same key, it runs the <strong>reduce function</strong> on them and writes the <strong>final output to a file</strong>.</p>
+<p><img loading="lazy" src="/images/2025-5-11-map-reduce/image%2011.png" alt="image.png"  />
+</p>
+<p>This same process happens in parallel for Reducers 2 and 3.</p>
+<p>Once all reducers finish it’s <strong>DONE!</strong></p>
+<h3 id="sorting-example">Sorting Example<a hidden class="anchor" aria-hidden="true" href="#sorting-example">#</a></h3>
+<p>now let’s see how sorting works using map reduce.
+the sorting confused me a bit, because i was thinking of memory constrains during the reduce phase. for the sorting to be done you must have enough space in your reducer to stored the output. in sorting the data is not moved around but the copy of the data is moved. so if the size of the data to be sorted is N we must have extra N free space left to store the result.</p>
+<p>sorting algorithms like external merge sort and external M-way merge are used to sort and merge the data that does not fit in memory.</p>
+<p>say you have 10 numbers range between 1-100 in 10 computer that must be sorted and you have 2 reducer. and partitioning of the intermediate keys is done using the following:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#a6e22e">number</span> <span style="color:#f92672">&lt;=</span> <span style="color:#ae81ff">50</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#75715e">// bucket-1
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>} <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#75715e">// bucket-2
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span></code></pre></div><p>here is how the state of the computers currently look like.</p>
+<p><img loading="lazy" src="/images/2025-5-11-map-reduce/image%2012.png" alt="image.png"  />
+</p>
+<p>now the workers are assigned map tasks and the numbers are sorted locally, for simplicity let’s assume each worker is assigned a single map task and the map task contains includes all the numbers present in the worker.</p>
+<p>now the numbers are sorted locally within the worker.
+here is current state of the workers.</p>
+<p><img loading="lazy" src="/images/2025-5-11-map-reduce/image%2013.png" alt="image.png"  />
+</p>
+<p>now it’s time for the reduce phase, as discussed before the workers will send back the master computer the addresses of the intermediate buckets, these addresses are sent to the reducers.</p>
+<p>let’s zoom into the working of the reducer 1, here the reducer fetches all the buckets, and performs m-way merge, if the data is too large, it streams the data from the worker so that it’s not overloaded. and if the data is too large to fit into memory it performs m-way external merge.</p>
+<p><img loading="lazy" src="/images/2025-5-11-map-reduce/image%2014.png" alt="image.png"  />
+</p>
+<p>and similarly reducer 2 performs the reduce task and finally we get two output files containing numbers in the sorted order, remember these are just copy of the original number that are in the computers.</p>
+<h3 id="some-interesting-stuff">Some Interesting Stuff<a hidden class="anchor" aria-hidden="true" href="#some-interesting-stuff">#</a></h3>
+<p>Now that we&rsquo;ve gone through how MapReduce works conceptually, let’s get into a practical bit — my implementation of file splitting for MapReduce. This is part of my solution for <a href="https://pdos.csail.mit.edu/6.824/labs/lab-mr.html">Lab 1</a> of the <a href="https://pdos.csail.mit.edu/6.824/index.html">MIT 6.5840</a> course.</p>
+<p>Here, I’ll talk about one interesting challenge: <strong>splitting a file into chunks that preserve full lines</strong>.</p>
+<h3 id="the-problem-chunking-without-breaking-lines">The Problem: Chunking Without Breaking Lines<a hidden class="anchor" aria-hidden="true" href="#the-problem-chunking-without-breaking-lines">#</a></h3>
+<p>Let’s say we have a file with 5 lines.</p>
+<p>If we naively split it into fixed-size chunks, it might look like this:</p>
+<p>As you can see, the line <code>&quot;they play outside.&quot;</code> is <strong>split between two chunks</strong>. The character <code>'T'</code> is in chunk 2, while the rest is in chunk 3.</p>
+<p>This is problematic because I wanted each map task to be able to process the file <strong>line by line</strong>, which becomes difficult when lines are split across chunks.</p>
+<h3 id="the-first-bad-idea-">The First (Bad) Idea 💡<a hidden class="anchor" aria-hidden="true" href="#the-first-bad-idea-">#</a></h3>
+<p>At first, I thought: “Why not just read the file line by line and store those lines in tasks?”</p>
+<p>But that turns out to be <strong>a really bad idea</strong>.</p>
+<p>Why? Because it forces the <strong>coordinator</strong> (or master) to read the entire file — defeating the point of MapReduce, especially if you have <strong>thousands of files, each potentially gigabytes in size</strong>. This kills scalability.</p>
+<h3 id="the-right-approach">The Right Approach<a hidden class="anchor" aria-hidden="true" href="#the-right-approach">#</a></h3>
+<p>Instead, we should create chunks <strong>based on metadata</strong> (like file size), without reading the file content during task creation.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// creates list of MapTasks from chunks
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">createMapTasks</span>(<span style="color:#a6e22e">files</span> []<span style="color:#66d9ef">string</span>, <span style="color:#a6e22e">nReduce</span> <span style="color:#66d9ef">int</span>) []<span style="color:#a6e22e">MapTask</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">slogger</span>.<span style="color:#a6e22e">Info</span>(<span style="color:#e6db74">&#34;Creating map tasks&#34;</span>, <span style="color:#e6db74">&#34;nReduce&#34;</span>, <span style="color:#a6e22e">nReduce</span>, <span style="color:#e6db74">&#34;files&#34;</span>, <span style="color:#a6e22e">files</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">tasks</span> <span style="color:#f92672">:=</span> []<span style="color:#a6e22e">MapTask</span>{}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">file</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">files</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">chunks</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">createChunks</span>(<span style="color:#a6e22e">file</span>)
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">chunk</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">chunks</span> {
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">task</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">MapTask</span>{
+</span></span><span style="display:flex;"><span>				<span style="color:#a6e22e">Id</span>:      <span style="color:#a6e22e">uuid</span>.<span style="color:#a6e22e">NewString</span>(),
+</span></span><span style="display:flex;"><span>				<span style="color:#a6e22e">Chunk</span>:   <span style="color:#a6e22e">chunk</span>,
+</span></span><span style="display:flex;"><span>				<span style="color:#a6e22e">NReduce</span>: <span style="color:#a6e22e">nReduce</span>,
+</span></span><span style="display:flex;"><span>			}
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">tasks</span> = append(<span style="color:#a6e22e">tasks</span>, <span style="color:#a6e22e">task</span>)
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">slogger</span>.<span style="color:#a6e22e">Info</span>(<span style="color:#e6db74">&#34;Created map task&#34;</span>, <span style="color:#e6db74">&#34;taskId&#34;</span>, <span style="color:#a6e22e">task</span>.<span style="color:#a6e22e">Id</span>, <span style="color:#e6db74">&#34;file&#34;</span>, <span style="color:#a6e22e">file</span>)
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">tasks</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#75715e">// splits the file into chunks
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">createChunks</span>(<span style="color:#a6e22e">filename</span> <span style="color:#66d9ef">string</span>) []<span style="color:#a6e22e">Chunk</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">fi</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Stat</span>(<span style="color:#a6e22e">filename</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Fatal</span>(<span style="color:#e6db74">&#34;reading file stat:&#34;</span>, <span style="color:#a6e22e">err</span>)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">size</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">fi</span>.<span style="color:#a6e22e">Size</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">count</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">math</span>.<span style="color:#a6e22e">Ceil</span>(float64(<span style="color:#a6e22e">size</span>) <span style="color:#f92672">/</span> float64(<span style="color:#a6e22e">CHUNK_SIZE</span>))
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">tasks</span> <span style="color:#f92672">:=</span> []<span style="color:#a6e22e">Chunk</span>{}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> int(<span style="color:#a6e22e">count</span>) {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">task</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">Chunk</span>{
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">Filename</span>: <span style="color:#a6e22e">filename</span>,
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">Offset</span>:   int64(<span style="color:#a6e22e">CHUNK_SIZE</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">i</span>),
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">Size</span>:     int64(<span style="color:#a6e22e">CHUNK_SIZE</span>),
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">tasks</span> = append(<span style="color:#a6e22e">tasks</span>, <span style="color:#a6e22e">task</span>)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">tasks</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Here, I’m using just the file size to define chunk boundaries — no content is read at this point.</p>
+<h3 id="handling-line-boundaries-when-reading">Handling Line Boundaries When Reading<a hidden class="anchor" aria-hidden="true" href="#handling-line-boundaries-when-reading">#</a></h3>
+<p>Now comes the tricky part: reading the chunk while ensuring we don’t break lines.</p>
+<p>The logic:</p>
+<ul>
+<li>If the <strong>last character</strong> of a chunk isn’t <code>\n</code>, it means the line continues into the <strong>next chunk</strong>.</li>
+<li>So, the next chunk will <strong>skip the first line</strong> (since it was already partially included in the previous one).</li>
+<li>Additionally, the current chunk might need to <strong>grab</strong> the remaining part of the line from the next chunk.</li>
+</ul>
+<p>Here’s how I implemented it:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#75715e">// readChunk reads a chunk and returns full lines, handling line splits at boundaries
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">readChunk</span>(<span style="color:#a6e22e">task</span> <span style="color:#a6e22e">Chunk</span>) []<span style="color:#66d9ef">string</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">...</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Check the last byte of the previous chunk
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">task</span>.<span style="color:#a6e22e">Offset</span> <span style="color:#f92672">!=</span> <span style="color:#ae81ff">0</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">prevChunkLast</span> <span style="color:#f92672">:=</span> make([]<span style="color:#66d9ef">byte</span>, <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">...</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">prevChunkLast</span>[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">!=</span> <span style="color:#e6db74">&#39;\n&#39;</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">skipStart</span> = <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">...</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Read lines using bufio.Scanner
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">scanner</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">bufio</span>.<span style="color:#a6e22e">NewScanner</span>(<span style="color:#a6e22e">bytes</span>.<span style="color:#a6e22e">NewBuffer</span>(<span style="color:#a6e22e">chunk</span>))
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> <span style="color:#a6e22e">scanner</span>.<span style="color:#a6e22e">Scan</span>() {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">skipStart</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">continue</span>
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">lines</span> = append(<span style="color:#a6e22e">lines</span>, <span style="color:#a6e22e">scanner</span>.<span style="color:#a6e22e">Text</span>())
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// If this chunk ends in the middle of a line, grab the rest from the next chunk
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">checkNext</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">...</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">lines</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>This way, each map task processes only <strong>complete lines</strong>, and the coordinator doesn’t need to read entire files — staying true to the spirit of distributed processing.</p>
+<p><strong>&hellip;and then I realized</strong> — the test cases were actually applying the <code>mapf</code> function on the <strong>entire file directly</strong> 😅.</p>
+<p>So technically, I didn’t even need to split the files at all. <strong>LOL.</strong></p>
+<p>If you&rsquo;re curious, you can <strong>check out my full implementation</strong> (including this chunk-splitting logic and more) here:</p>
+<p>👉 <a href="https://github.com/sanjayJ369/dist-db">https://github.com/sanjayJ369/dist-db</a></p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="http://localhost:1313/tags/learn/">Learn</a></li>
+      <li><a href="http://localhost:1313/tags/distributed/">Distributed</a></li>
+      <li><a href="http://localhost:1313/tags/databases/">Databases</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="next" href="http://localhost:1313/posts/schedule-tracker/">
+    <span class="title">Next »</span>
+    <br>
+    <span>Schedule Tracker</span>
+  </a>
+</nav>
+
+
+<ul class="share-buttons">
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Map Reduce on x"
+            href="https://x.com/intent/tweet/?text=Map%20Reduce&amp;url=http%3a%2f%2flocalhost%3a1313%2fposts%2fmap-reduce%2f&amp;hashtags=learn%2cdistributed%2cdatabases">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M512 62.554 L 512 449.446 C 512 483.97 483.97 512 449.446 512 L 62.554 512 C 28.03 512 0 483.97 0 449.446 L 0 62.554 C 0 28.03 28.029 0 62.554 0 L 449.446 0 C 483.971 0 512 28.03 512 62.554 Z M 269.951 190.75 L 182.567 75.216 L 56 75.216 L 207.216 272.95 L 63.9 436.783 L 125.266 436.783 L 235.9 310.383 L 332.567 436.783 L 456 436.783 L 298.367 228.367 L 432.367 75.216 L 371.033 75.216 Z M 127.633 110 L 164.101 110 L 383.481 400.065 L 349.5 400.065 Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Map Reduce on linkedin"
+            href="https://www.linkedin.com/shareArticle?mini=true&amp;url=http%3a%2f%2flocalhost%3a1313%2fposts%2fmap-reduce%2f&amp;title=Map%20Reduce&amp;summary=Map%20Reduce&amp;source=http%3a%2f%2flocalhost%3a1313%2fposts%2fmap-reduce%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-288.985,423.278l0,-225.717l-75.04,0l0,225.717l75.04,0Zm270.539,0l0,-129.439c0,-69.333 -37.018,-101.586 -86.381,-101.586c-39.804,0 -57.634,21.891 -67.617,37.266l0,-31.958l-75.021,0c0.995,21.181 0,225.717 0,225.717l75.02,0l0,-126.056c0,-6.748 0.486,-13.492 2.474,-18.315c5.414,-13.475 17.767,-27.434 38.494,-27.434c27.135,0 38.007,20.707 38.007,51.037l0,120.768l75.024,0Zm-307.552,-334.556c-25.674,0 -42.448,16.879 -42.448,39.002c0,21.658 16.264,39.002 41.455,39.002l0.484,0c26.165,0 42.452,-17.344 42.452,-39.002c-0.485,-22.092 -16.241,-38.954 -41.943,-39.002Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Map Reduce on reddit"
+            href="https://reddit.com/submit?url=http%3a%2f%2flocalhost%3a1313%2fposts%2fmap-reduce%2f&title=Map%20Reduce">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-3.446,265.638c0,-22.964 -18.616,-41.58 -41.58,-41.58c-11.211,0 -21.361,4.457 -28.841,11.666c-28.424,-20.508 -67.586,-33.757 -111.204,-35.278l18.941,-89.121l61.884,13.157c0.756,15.734 13.642,28.29 29.56,28.29c16.407,0 29.706,-13.299 29.706,-29.701c0,-16.403 -13.299,-29.702 -29.706,-29.702c-11.666,0 -21.657,6.792 -26.515,16.578l-69.105,-14.69c-1.922,-0.418 -3.939,-0.042 -5.585,1.036c-1.658,1.073 -2.811,2.761 -3.224,4.686l-21.152,99.438c-44.258,1.228 -84.046,14.494 -112.837,35.232c-7.468,-7.164 -17.589,-11.591 -28.757,-11.591c-22.965,0 -41.585,18.616 -41.585,41.58c0,16.896 10.095,31.41 24.568,37.918c-0.639,4.135 -0.99,8.328 -0.99,12.576c0,63.977 74.469,115.836 166.33,115.836c91.861,0 166.334,-51.859 166.334,-115.836c0,-4.218 -0.347,-8.387 -0.977,-12.493c14.564,-6.47 24.735,-21.034 24.735,-38.001Zm-119.474,108.193c-20.27,20.241 -59.115,21.816 -70.534,21.816c-11.428,0 -50.277,-1.575 -70.522,-21.82c-3.007,-3.008 -3.007,-7.882 0,-10.889c3.003,-2.999 7.882,-3.003 10.885,0c12.777,12.781 40.11,17.317 59.637,17.317c19.522,0 46.86,-4.536 59.657,-17.321c3.016,-2.999 7.886,-2.995 10.885,0.008c3.008,3.011 3.003,7.882 -0.008,10.889Zm-5.23,-48.781c-16.373,0 -29.701,-13.324 -29.701,-29.698c0,-16.381 13.328,-29.714 29.701,-29.714c16.378,0 29.706,13.333 29.706,29.714c0,16.374 -13.328,29.698 -29.706,29.698Zm-160.386,-29.702c0,-16.381 13.328,-29.71 29.714,-29.71c16.369,0 29.689,13.329 29.689,29.71c0,16.373 -13.32,29.693 -29.689,29.693c-16.386,0 -29.714,-13.32 -29.714,-29.693Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Map Reduce on facebook"
+            href="https://facebook.com/sharer/sharer.php?u=http%3a%2f%2flocalhost%3a1313%2fposts%2fmap-reduce%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-106.468,0l0,-192.915l66.6,0l12.672,-82.621l-79.272,0l0,-53.617c0,-22.603 11.073,-44.636 46.58,-44.636l36.042,0l0,-70.34c0,0 -32.71,-5.582 -63.982,-5.582c-65.288,0 -107.96,39.569 -107.96,111.204l0,62.971l-72.573,0l0,82.621l72.573,0l0,192.915l-191.104,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Map Reduce on whatsapp"
+            href="https://api.whatsapp.com/send?text=Map%20Reduce%20-%20http%3a%2f%2flocalhost%3a1313%2fposts%2fmap-reduce%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-58.673,127.703c-33.842,-33.881 -78.847,-52.548 -126.798,-52.568c-98.799,0 -179.21,80.405 -179.249,179.234c-0.013,31.593 8.241,62.428 23.927,89.612l-25.429,92.884l95.021,-24.925c26.181,14.28 55.659,21.807 85.658,21.816l0.074,0c98.789,0 179.206,-80.413 179.247,-179.243c0.018,-47.895 -18.61,-92.93 -52.451,-126.81Zm-126.797,275.782l-0.06,0c-26.734,-0.01 -52.954,-7.193 -75.828,-20.767l-5.441,-3.229l-56.386,14.792l15.05,-54.977l-3.542,-5.637c-14.913,-23.72 -22.791,-51.136 -22.779,-79.287c0.033,-82.142 66.867,-148.971 149.046,-148.971c39.793,0.014 77.199,15.531 105.329,43.692c28.128,28.16 43.609,65.592 43.594,105.4c-0.034,82.149 -66.866,148.983 -148.983,148.984Zm81.721,-111.581c-4.479,-2.242 -26.499,-13.075 -30.604,-14.571c-4.105,-1.495 -7.091,-2.241 -10.077,2.241c-2.986,4.483 -11.569,14.572 -14.182,17.562c-2.612,2.988 -5.225,3.364 -9.703,1.12c-4.479,-2.241 -18.91,-6.97 -36.017,-22.23c-13.314,-11.876 -22.304,-26.542 -24.916,-31.026c-2.612,-4.484 -0.279,-6.908 1.963,-9.14c2.016,-2.007 4.48,-5.232 6.719,-7.847c2.24,-2.615 2.986,-4.484 4.479,-7.472c1.493,-2.99 0.747,-5.604 -0.374,-7.846c-1.119,-2.241 -10.077,-24.288 -13.809,-33.256c-3.635,-8.733 -7.327,-7.55 -10.077,-7.688c-2.609,-0.13 -5.598,-0.158 -8.583,-0.158c-2.986,0 -7.839,1.121 -11.944,5.604c-4.105,4.484 -15.675,15.32 -15.675,37.364c0,22.046 16.048,43.342 18.287,46.332c2.24,2.99 31.582,48.227 76.511,67.627c10.685,4.615 19.028,7.371 25.533,9.434c10.728,3.41 20.492,2.929 28.209,1.775c8.605,-1.285 26.499,-10.833 30.231,-21.295c3.732,-10.464 3.732,-19.431 2.612,-21.298c-1.119,-1.869 -4.105,-2.99 -8.583,-5.232Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Map Reduce on telegram"
+            href="https://telegram.me/share/url?text=Map%20Reduce&amp;url=http%3a%2f%2flocalhost%3a1313%2fposts%2fmap-reduce%2f">
+            <svg version="1.1" xml:space="preserve" viewBox="2 2 28 28" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M26.49,29.86H5.5a3.37,3.37,0,0,1-2.47-1,3.35,3.35,0,0,1-1-2.47V5.48A3.36,3.36,0,0,1,3,3,3.37,3.37,0,0,1,5.5,2h21A3.38,3.38,0,0,1,29,3a3.36,3.36,0,0,1,1,2.46V26.37a3.35,3.35,0,0,1-1,2.47A3.38,3.38,0,0,1,26.49,29.86Zm-5.38-6.71a.79.79,0,0,0,.85-.66L24.73,9.24a.55.55,0,0,0-.18-.46.62.62,0,0,0-.41-.17q-.08,0-16.53,6.11a.59.59,0,0,0-.41.59.57.57,0,0,0,.43.52l4,1.24,1.61,4.83a.62.62,0,0,0,.63.43.56.56,0,0,0,.4-.17L16.54,20l4.09,3A.9.9,0,0,0,21.11,23.15ZM13.8,20.71l-1.21-4q8.72-5.55,8.78-5.55c.15,0,.23,0,.23.16a.18.18,0,0,1,0,.06s-2.51,2.3-7.52,6.8Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Map Reduce on ycombinator"
+            href="https://news.ycombinator.com/submitlink?t=Map%20Reduce&u=http%3a%2f%2flocalhost%3a1313%2fposts%2fmap-reduce%2f">
+            <svg version="1.1" xml:space="preserve" width="30px" height="30px" viewBox="0 0 512 512" fill="currentColor"
+                xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape">
+                <path
+                    d="M449.446 0C483.971 0 512 28.03 512 62.554L512 449.446C512 483.97 483.97 512 449.446 512L62.554 512C28.03 512 0 483.97 0 449.446L0 62.554C0 28.03 28.029 0 62.554 0L449.446 0ZM183.8767 87.9921H121.8427L230.6673 292.4508V424.0079H281.3328V292.4508L390.1575 87.9921H328.1233L256 238.2489z" />
+            </svg>
+        </a>
+    </li>
+</ul>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2025 <a href="http://localhost:1313/">Sanjay&#39;s Blog</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

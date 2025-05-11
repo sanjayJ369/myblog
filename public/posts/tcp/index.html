@@ -4,7 +4,7 @@
 <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="robots" content="noindex, nofollow">
+<meta name="robots" content="index, follow">
 <title>TCP | Sanjay&#39;s Blog</title>
 <meta name="keywords" content="learn, network">
 <meta name="description" content="TCP stands for Transmission Control Protocol. It&rsquo;s built upon the IP layer and provides features like reliable packet transmission, flow control, congestion control, and congestion avoidance.
@@ -62,6 +62,81 @@ TCP is widely used because of the features it offers, such as reliable packet tr
 
     </style>
 </noscript>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-M5Y3YNK58R"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-M5Y3YNK58R', { 'anonymize_ip': false });
+}
+</script>
+<meta property="og:title" content="TCP" />
+<meta property="og:description" content="TCP stands for Transmission Control Protocol. It&rsquo;s built upon the IP layer and provides features like reliable packet transmission, flow control, congestion control, and congestion avoidance.
+Why is TCP the most used protocol?
+TCP is widely used because of the features it offers, such as reliable packet transmission, flow control, and others. Reliable transmission ensures data arrives complete and in order, making it crucial for applications like file transfers, email, and web browsing." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/posts/tcp/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2024-01-21T00:00:00+00:00" />
+<meta property="article:modified_time" content="2024-01-21T00:00:00+00:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="TCP"/>
+<meta name="twitter:description" content="TCP stands for Transmission Control Protocol. It&rsquo;s built upon the IP layer and provides features like reliable packet transmission, flow control, congestion control, and congestion avoidance.
+Why is TCP the most used protocol?
+TCP is widely used because of the features it offers, such as reliable packet transmission, flow control, and others. Reliable transmission ensures data arrives complete and in order, making it crucial for applications like file transfers, email, and web browsing."/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "http://localhost:1313/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "TCP",
+      "item": "http://localhost:1313/posts/tcp/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "TCP",
+  "name": "TCP",
+  "description": "TCP stands for Transmission Control Protocol. It\u0026rsquo;s built upon the IP layer and provides features like reliable packet transmission, flow control, congestion control, and congestion avoidance.\nWhy is TCP the most used protocol?\nTCP is widely used because of the features it offers, such as reliable packet transmission, flow control, and others. Reliable transmission ensures data arrives complete and in order, making it crucial for applications like file transfers, email, and web browsing.",
+  "keywords": [
+    "learn", "network"
+  ],
+  "articleBody": "TCP stands for Transmission Control Protocol. It’s built upon the IP layer and provides features like reliable packet transmission, flow control, congestion control, and congestion avoidance.\nWhy is TCP the most used protocol?\nTCP is widely used because of the features it offers, such as reliable packet transmission, flow control, and others. Reliable transmission ensures data arrives complete and in order, making it crucial for applications like file transfers, email, and web browsing.\nWhat does reliable packet transmission mean?\nWhen packets travel over the internet, they can get lost or corrupted. Reliable transmission guarantees that all packets arrive at their destination complete and in the correct order. If a packet is lost or corrupted, TCP detects it using checksums and requests the sender to resend it. This ensures accurate and complete data exchange.\nWhat is flow control?\nThink of flow control like regulating water flow from a large tank to a small cup. If the water flows too fast, the cup overflows. Similarly, Our computer will have some memory buffer which is used to store the incoming packers before processing, when the server keeps on sending the data and when our ability process them in less, packets will start accumulating in the memory buffer and soon will lead to packet loss due to buffer overflow, to avoid this TCP will keep track of a variable known as receive window (rwnd) both the server and client will have their own receive window, and these are initially exchange during the three-way handshake, when there is a change in rwnd it can again be exchanged between the server and client to keep up with the new requirements\nWhat is congestion control?\nTwo main factors determine your internet speed: bandwidth and receive window. Flow control takes care of the receive window, but what about bandwidth? Imagine you have a 30Mbps connection and the server sends data at 100Mbps. This creates network congestion because your connection can only handle 30Mbps, leading to packet loss. So, how does the server handle this?\nThe server tracks another variable called “congestion window size (cwnd)” – the amount of data it can send at once. Unlike the receive window, the cwnd is not shared, and for Linux systems, it starts at 4kb. TCP dynamically adjusts the cwnd based on acknowledgments (ACKs) from the client. It increases the cwnd if all packets are received and decreases it if there’s any packet loss. There are various congestion control algorithms like Slow Start, Congestion Avoidance, and Fast Retransmit that utilize ACKs to determine the optimal cwnd value, ensuring efficient data transfer without overwhelming the network.\nBandwidth Delay Product (BDP)\nIt ****is the product of a connection’s bandwidth and its end-to-end delay (also known as round-trip time). It indicates the maximum amount of unacknowledged data that can be in transit without overwhelming the network or receiver’s buffers.\nThe maximum amount of unacknowledged data in transit is limited to the minimum of the receive window size (RWND) and congestion window size (CWND). This is because:\nIf CWND were greater than RWND, the sender might transmit more data than the receiver can handle, leading to buffer overflow and packet loss. If RWND were greater than CWND, the sender might not fully utilize available bandwidth, potentially leading to underutilised links. therefor even if we have sufficient bandwidth our internet speed can be limited due to our receive window\n",
+  "wordCount" : "562",
+  "inLanguage": "en",
+  "datePublished": "2024-01-21T00:00:00Z",
+  "dateModified": "2024-01-21T00:00:00Z",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "http://localhost:1313/posts/tcp/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Sanjay's Blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "http://localhost:1313/favicon.webp"
+    }
+  }
+}
+</script>
 </head>
 
 <body class="" id="top">
@@ -248,7 +323,7 @@ TCP is widely used because of the features it offers, such as reliable packet tr
     </main>
     
 <footer class="footer">
-        <span>&copy; 2024 <a href="http://localhost:1313/">Sanjay&#39;s Blog</a></span> · 
+        <span>&copy; 2025 <a href="http://localhost:1313/">Sanjay&#39;s Blog</a></span> · 
 
     <span>
         Powered by

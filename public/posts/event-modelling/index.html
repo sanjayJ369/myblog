@@ -4,7 +4,7 @@
 <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="robots" content="noindex, nofollow">
+<meta name="robots" content="index, follow">
 <title>event modeling | Sanjay&#39;s Blog</title>
 <meta name="keywords" content="learn">
 <meta name="description" content="event modelling What is event modeling?
@@ -63,6 +63,83 @@ Orange sticky notes: Represent events. We write down the event occurrence in t
 
     </style>
 </noscript>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-M5Y3YNK58R"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-M5Y3YNK58R', { 'anonymize_ip': false });
+}
+</script>
+<meta property="og:title" content="event modeling" />
+<meta property="og:description" content="event modelling What is event modeling?
+Event modeling is a simple technique used to design a system. It generally takes relatively little time to learn and get started. In event modeling, we use sticky notes to write things down.
+Sticky note colors and their purposes:
+Orange sticky notes: Represent events. We write down the event occurrence in the past tense. Events are generally triggered by the UI or by some external API." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/posts/event-modelling/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2024-01-12T00:00:00+00:00" />
+<meta property="article:modified_time" content="2024-01-12T00:00:00+00:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="event modeling"/>
+<meta name="twitter:description" content="event modelling What is event modeling?
+Event modeling is a simple technique used to design a system. It generally takes relatively little time to learn and get started. In event modeling, we use sticky notes to write things down.
+Sticky note colors and their purposes:
+Orange sticky notes: Represent events. We write down the event occurrence in the past tense. Events are generally triggered by the UI or by some external API."/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "http://localhost:1313/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "event modeling",
+      "item": "http://localhost:1313/posts/event-modelling/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "event modeling",
+  "name": "event modeling",
+  "description": "event modelling What is event modeling?\nEvent modeling is a simple technique used to design a system. It generally takes relatively little time to learn and get started. In event modeling, we use sticky notes to write things down.\nSticky note colors and their purposes:\nOrange sticky notes: Represent events. We write down the event occurrence in the past tense. Events are generally triggered by the UI or by some external API.",
+  "keywords": [
+    "learn"
+  ],
+  "articleBody": "event modelling What is event modeling?\nEvent modeling is a simple technique used to design a system. It generally takes relatively little time to learn and get started. In event modeling, we use sticky notes to write things down.\nSticky note colors and their purposes:\nOrange sticky notes: Represent events. We write down the event occurrence in the past tense. Events are generally triggered by the UI or by some external API. Examples: Position updated, request received, response sent Blue sticky notes: Represent commands. We write down the command as an assertive sentence. A command is something that modifies the system state and is caused to happen. Examples: Update player health, send request Green sticky notes: Represent views. A view is like a snapshot of the current system state. It can be used to display the current state of the system to the user and can also be used by other system applications. Examples: Display player’s health Let’s try to create an event modeling diagram for a simple fitness app that we will be making.\nLet’s start with what we want our app to do:\nDisplay today’s to-do exercises Send reminder notifications to exercise Keep track of streaks Now that we know what our simple app should do, let’s think about the events. Here are a few that I came up with:\nRequested today’s exercises Completed today’s exercises Alarm set Notification sent Requested current streak Set time reached Now that we have our events, let’s see how these events can be triggered. We use simple wireframes or actual screenshots of the app (if it’s already developed) to represent the UI. We align the UI wireframe with the event that will be triggered by user interaction.\nNow, let’s add the blue sticky notes for the commands that need to be executed in order to trigger the events. Commands generally act as inputs from the user that change the state of the system\nAnd now, let’s also include green sticky notes, which are generally used to display the state of the system. You can also use gears or other diagrams to represent work done by the API used by our app. Here, I have represented it as a cloud as a process.\nto know more about event modelling see: https://eventmodeling.org/posts/what-is-event-modeling/\nWhy we need to use event modelling?\ni feel like event modelling helps us understand the overall working of the system better\nthe idea can be communicated more effectively to the non technical people like UI\\UX designers and more people can contribute actively to the designing and features of the system\nevent modelling make building CQRS based systems easier as there is a clear separation between the query an view in the system\nWhat is CQRS?\nCQRS stands for Command Query Responsibility Segregation. It is a design pattern that separates the read model from the write model. This means using one model for querying data and a separate model for updating data (including creates, updates, and deletes).\nWhen should we use CQRS?\nCQRS is generally used when there is a nonuniform distribution between queries to the database and updates to the database. When we have a single model for basic CRUD (Create, Read, Update, Delete) operations, scaling is not very efficient. Having two different models helps us scale the query model and update model independently, which makes our application more efficient. Proper scaling can even be done if we use different databases for reads and updates, but we need to make sure that they are in sync.\nThe CQRS model is also used when the business logic becomes more complex for basic CRUD operations.\nThings to keep in mind before implementing CQRS:\nImplementing CQRS can get complex, and if we are using separate databases for reads and updates, we need to maintain consistency between the databases. It is preferred not to use CQRS when the business logic is simple and simple CRUD models do the job.\nsources:\nhttps://eventmodeling.org/posts/what-is-event-modeling/\nhttps://learn.microsoft.com/en-us/azure/architecture/patterns/cqrs\nhttps://martinfowler.com/bliki/CQRS.html\n",
+  "wordCount" : "658",
+  "inLanguage": "en",
+  "datePublished": "2024-01-12T00:00:00Z",
+  "dateModified": "2024-01-12T00:00:00Z",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "http://localhost:1313/posts/event-modelling/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Sanjay's Blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "http://localhost:1313/favicon.webp"
+    }
+  }
+}
+</script>
 </head>
 
 <body class="" id="top">
@@ -307,7 +384,7 @@ Orange sticky notes: Represent events. We write down the event occurrence in t
     </main>
     
 <footer class="footer">
-        <span>&copy; 2024 <a href="http://localhost:1313/">Sanjay&#39;s Blog</a></span> · 
+        <span>&copy; 2025 <a href="http://localhost:1313/">Sanjay&#39;s Blog</a></span> · 
 
     <span>
         Powered by

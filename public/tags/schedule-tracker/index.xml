@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Schedule Tracker on Sanjay&#39;s Blog</title>
+    <link>http://localhost:1313/tags/schedule-tracker/</link>
+    <description>Recent content in Schedule Tracker on Sanjay&#39;s Blog</description>
+    <generator>Hugo -- 0.123.7</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 19 Feb 2025 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/schedule-tracker/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Schedule Tracker</title>
+      <link>http://localhost:1313/posts/schedule-tracker/</link>
+      <pubDate>Wed, 19 Feb 2025 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/schedule-tracker/</guid>
+      <description>Schedule Tracker The main purpose of this project is to digitize the progress tracking I currently do with the help of my diary. Why did I choose this project? It’s fairly simple, and I haven’t built an end-to-end application before (other than the webhook tester). This project will include features like user accounts, logins, authentication, and more.
+Here’s a high-level overview of what I want to achieve:
+Sessions Tracking I usually track my daily progress using sessions.</description>
+    </item>
+  </channel>
+</rss>
