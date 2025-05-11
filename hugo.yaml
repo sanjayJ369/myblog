@@ -32,7 +32,6 @@ params:
   ShowPageNums: true
   ShowToc: true
   comments: true
-  env: production
 
   assets:
     favicon: "favicon.webp"
