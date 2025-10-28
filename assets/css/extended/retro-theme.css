@@ -1,0 +1,443 @@
+/* Retro Theme - Custom Font with Minimal Style */
+
+/* Light mode colors */
+:root {
+  --theme: #e8ebe8;
+  --entry: #e8ebe8;
+  --primary: #2d3d34;
+  --secondary: #4a5a52;
+  --tertiary: #6b7b73;
+  --content: #2d3d34;
+  --code-block-bg: #d8ddd8;
+  --code-bg: #cdd2cd;
+  --border: #bcc3bc;
+}
+
+/* Dark mode colors */
+.dark {
+  --theme: #0f172a;
+  --entry: #1e293b;
+  --primary: #c8e6c9;
+  --secondary: #a5d6a7;
+  --tertiary: #81c784;
+  --content: #c8e6c9;
+  --code-block-bg: #0f172a;
+  --code-bg: #1e293b;
+  --border: #2e7d32;
+}
+
+/* Typography */
+body {
+  letter-spacing: 0.3px;
+  position: relative;
+}
+
+/* CRT screen effect overlay */
+html::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  background: radial-gradient(
+      ellipse at top left,
+      transparent 25%,
+      rgba(0, 0, 0, 0.06) 100%
+    ),
+    radial-gradient(
+      ellipse at top right,
+      transparent 25%,
+      rgba(0, 0, 0, 0.06) 100%
+    ),
+    radial-gradient(
+      ellipse at bottom left,
+      transparent 25%,
+      rgba(0, 0, 0, 0.06) 100%
+    ),
+    radial-gradient(
+      ellipse at bottom right,
+      transparent 25%,
+      rgba(0, 0, 0, 0.06) 100%
+    );
+  z-index: 99999;
+}
+
+/* Scrollbar styling - override PaperMod */
+::-webkit-scrollbar {
+  width: 18px !important;
+  background: rgba(0, 0, 0, 0.1) !important;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1) !important;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary) !important;
+  border-radius: 8px !important;
+  min-height: 40px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--secondary) !important;
+}
+
+l::-webkit-scrollbar-button,
+::-webkit-scrollbar-button:increment,
+::-webkit-scrollbar-button:decrement {
+  display: none !important;
+}
+
+/* Dark mode scrollbar - lighter for visibility */
+.dark::-webkit-scrollbar-thumb {
+  background: var(--secondary) !important;
+}
+
+.dark::-webkit-scrollbar-thumb:hover {
+  background: var(--primary) !important;
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-color: var(--primary) rgba(0, 0, 0, 0.08) !important;
+  scrollbar-width: auto !important;
+}
+
+.dark {
+  scrollbar-color: var(--secondary) rgba(0, 0, 0, 0.08) !important;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+/* Improved spacing for bordered elements */
+article,
+.post-entry,
+.archive-container {
+  border: 3px solid var(--border);
+  border-radius: 4px;
+  padding: 12px;
+  transition: all 0.3s ease;
+}
+
+.dark article,
+.dark .post-entry,
+.dark .archive-container {
+  border-color: #334155;
+}
+
+.dark article:hover,
+.dark .post-entry:hover,
+.dark .archive-container:hover {
+  border-color: var(--primary);
+}
+
+/* Links - use PaperMod defaults */
+a {
+  color: var(--secondary);
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+a:hover {
+  text-decoration: underline wavy;
+}
+
+.dark a {
+  color: var(--primary);
+}
+
+.dark a:hover {
+  color: var(--secondary);
+  text-shadow: 0 0 8px rgba(200, 230, 201, 0.3);
+}
+
+/* Remove custom button styling - use PaperMod defaults */
+
+/* Navigation - fix dark mode text visibility */
+.dark nav {
+  color: var(--primary);
+}
+
+.dark nav a {
+  color: var(--primary);
+}
+
+.dark nav a:hover {
+  color: var(--secondary);
+}
+
+/* Light mode navigation */
+nav {
+  color: var(--primary);
+}
+
+nav a {
+  color: var(--primary);
+}
+
+nav a:hover {
+  color: var(--secondary);
+}
+
+/* Pagination nav - fix dark mode text visibility */
+.dark nav.pagination {
+  color: var(--primary);
+  background: var(--theme);
+}
+
+.dark nav.pagination a {
+  color: var(--primary) !important;
+  background: var(--theme);
+}
+
+.dark nav.pagination a:hover {
+  color: var(--secondary) !important;
+}
+
+/* Pagination nav - light mode */
+nav.pagination {
+  color: var(--primary);
+  background: var(--theme);
+}
+
+nav.pagination a {
+  color: var(--primary) !important;
+  background: var(--theme);
+}
+
+nav.pagination a:hover {
+  color: var(--secondary) !important;
+}
+
+/* Input and textarea styling */
+input[type="text"],
+input[type="email"],
+input[type="search"],
+textarea {
+  padding: 8px 10px;
+  border: 3px solid var(--border);
+  border-radius: 3px;
+  background: var(--theme);
+  color: var(--primary);
+  font-family: inherit;
+  font-size: 0.95em;
+  transition: border-color 0.2s ease;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="search"]:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--secondary);
+  box-shadow: 0 0 0 2px rgba(71, 85, 105, 0.1);
+}
+
+.dark input[type="text"],
+.dark input[type="email"],
+.dark input[type="search"],
+.dark textarea {
+  background: var(--entry);
+  color: var(--content);
+  border-color: #334155;
+}
+
+.dark input[type="text"]:focus,
+.dark input[type="email"]:focus,
+.dark input[type="search"]:focus,
+.dark textarea:focus {
+  border-color: var(--secondary);
+  box-shadow: 0 0 0 2px rgba(203, 213, 225, 0.1);
+}
+
+/* Post metadata and accents */
+.post-meta {
+  color: var(--secondary);
+  font-size: 0.9em;
+}
+
+.dark .post-meta {
+  color: var(--secondary);
+}
+
+.post-entry::before {
+  content: "▸";
+  margin-right: 8px;
+}
+
+.dark .post-entry::before {
+  color: var(--primary);
+}
+
+/* Light mode syntax highlighting - override inline styles */
+/* Override the inline style colors for light theme */
+code {
+  border: none;
+  border-radius: 0 !important;
+}
+code span {
+  color: #2d3d34 !important;
+}
+
+/* Keywords - override the light blue (#66d9ef) */
+code span[style*="color:#66d9ef"] {
+  color: #1a4d3e !important;
+  font-weight: bold;
+}
+
+code span[style*="color:#f92672"] {
+  color: #2d5a4a !important; /* Strings */
+}
+
+code span[style*="color:#75715e"] {
+  color: #6b7b73 !important; /* Comments */
+  font-style: italic;
+}
+
+code span[style*="color:#ae81ff"] {
+  color: #2d5a4a !important; /* Numbers/Constants */
+}
+
+code span[style*="color:#e6db74"] {
+  color: #2d5a4a !important; /* Strings */
+}
+
+code span[style*="color:#a1efe4"] {
+  color: #1a4d3e !important; /* Types */
+}
+
+/* Dark mode syntax highlighting */
+.dark code span {
+  color: #c8e6c9 !important;
+}
+
+/* Dark mode - override inline styles for better contrast */
+.dark code span[style*="color:#66d9ef"] {
+  color: #81c784 !important; /* Keywords - brighter green */
+  font-weight: bold;
+}
+
+.dark code span[style*="color:#f92672"] {
+  color: #a5d6a7 !important; /* Strings */
+}
+
+.dark code span[style*="color:#75715e"] {
+  color: #66bb6a !important; /* Comments - green tint */
+  font-style: italic;
+  opacity: 0.8;
+}
+
+.dark code span[style*="color:#ae81ff"] {
+  color: #a5d6a7 !important; /* Numbers/Constants */
+}
+
+.dark code span[style*="color:#e6db74"] {
+  color: #a5d6a7 !important; /* Strings */
+}
+
+.dark code span[style*="color:#a1efe4"] {
+  color: #81c784 !important; /* Types - green */
+}
+
+/* Subtle scanline effect on code blocks */
+pre {
+  position: relative;
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.02) 0px,
+    rgba(0, 0, 0, 0.02) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  background-size: 100% 2px;
+}
+
+.dark pre {
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(255, 255, 255, 0.03) 0px,
+    rgba(255, 255, 255, 0.03) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+}
+
+/* Retro list styling */
+.content ul,
+.content ol {
+  padding-left: 2em;
+}
+
+.content li {
+  margin-bottom: 0.5em;
+  line-height: 1.6;
+}
+
+/* Retro blockquote styling */
+blockquote {
+  border-left: 4px solid var(--secondary);
+  padding-left: 1em;
+  margin-left: 0;
+  font-style: italic;
+  opacity: 0.85;
+}
+
+.dark blockquote {
+  border-left-color: var(--primary);
+  color: var(--primary);
+}
+
+/* Retro table styling */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1em 0;
+  font-size: 0.95em;
+}
+
+table th {
+  background: var(--tertiary);
+  padding: 0.75em;
+  text-align: left;
+  font-weight: 700;
+}
+
+table td {
+  border-bottom: 1px solid var(--border);
+  padding: 0.75em;
+}
+
+table tr:hover {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.dark table tr:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* Inline code styling */
+p code,
+li code {
+  background: rgba(0, 0, 0, 0.03);
+  padding: 0.2em 0.4em;
+  border-radius: 0;
+  border: 1px solid var(--tertiary);
+}
+
+.dark p code,
+.dark li code {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: #334155;
+  color: var(--primary);
+}
