@@ -1,0 +1,29 @@
+@font-face {
+  font-family: "GohuFont";
+  font-style: normal;
+  font-weight: 400; /* 400 = Regular */
+  font-display: swap;
+  src: url("/fonts/Gohu/GohuFont14NerdFont-Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "GohuFontMono";
+  font-style: normal;
+  font-weight: 400; /* 400 = Regular */
+  font-display: swap;
+  src: url("/fonts/Gohu/GohuFont14NerdFontMono-Regular.ttf") format("truetype");
+}
+
+:root {
+  --font-family: "GohuFont", monospace;
+  --font-family-monospace: "GohuFontMono", monospace;
+}
+
+/* Apply custom font to body and common text elements */
+body,
+button,
+input,
+textarea,
+select {
+  font-family: var(--font-family) !important;
+}
