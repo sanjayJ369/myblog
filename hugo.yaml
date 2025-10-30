@@ -3,6 +3,9 @@ languageCode: en-us
 title: Sanjay's Blog
 theme: ["PaperMod"]
 googleAnalytics: "G-M5Y3YNK58R"
+buildFuture: true
+paginate: 10
+mainSections: ["posts"]
 
 menu:
   main:
