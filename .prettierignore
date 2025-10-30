@@ -1,0 +1,13 @@
+# Hugo template files
+layouts/
+
+# Build output
+public/
+resources/
+
+# Static files
+static/
+
+# Other
+.git/
+.hugo_build.lock

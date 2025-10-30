@@ -1,0 +1,25 @@
+/* SVG Theme Variables - Auto-generated
+   Keep accent colors meaningful while swapping text/background for theme support
+*/
+
+/* Light Mode */
+:root {
+  --svg-text-primary: #1e1e1e;
+  --svg-text-secondary: #4a5a52;
+  --svg-bg-light: #ffffff;
+  --svg-bg-subtle: #f3f3f3;
+  --svg-border: #bcc3bc;
+  --svg-accent-secondary: #6b7b73;
+  --svg-accent-1: #d73a49;
+}
+
+/* Dark Mode */
+.dark {
+  --svg-text-primary: #c8e6c9;
+  --svg-text-secondary: #a5d6a7;
+  --svg-bg-light: #1e293b;
+  --svg-bg-subtle: #0f172a;
+  --svg-border: #334155;
+  --svg-accent-secondary: #66bb6a;
+  --svg-accent-1: #ff7b72;
+}

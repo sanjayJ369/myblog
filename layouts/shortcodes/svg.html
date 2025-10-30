@@ -1,0 +1,38 @@
+{{- $svg := .Get 0 -}}
+{{- if not $svg -}}
+  {{- errorf "svg shortcode: missing SVG path" -}}
+{{- end -}}
+{{- $basePath := printf "/images/%s" $svg -}}
+{{- $content := readFile (printf "static%s" $basePath) -}}
+
+<div class="svg-container" style="display: inline-block;">
+  {{- $content | safeHTML -}}
+</div>
+
+<style>
+  .svg-container {
+    --svg-text-primary: var(--primary, #1e1e1e);
+    --svg-text-secondary: var(--secondary, #4a5a52);
+    --svg-bg-light: var(--theme, #ffffff);
+    --svg-bg-subtle: var(--entry, #f3f3f3);
+    --svg-border: var(--border, #bcc3bc);
+    --svg-accent-1: #d73a49;
+    --svg-accent-2: var(--tertiary, #6b7b73);
+  }
+
+  .dark .svg-container {
+    --svg-text-primary: var(--primary, #c8e6c9);
+    --svg-text-secondary: var(--secondary, #a5d6a7);
+    --svg-bg-light: var(--theme, #1e293b);
+    --svg-bg-subtle: var(--entry, #0f172a);
+    --svg-border: var(--border, #334155);
+    --svg-accent-1: #ff7b72;
+    --svg-accent-2: var(--tertiary, #66bb6a);
+  }
+
+  .svg-container svg {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+</style>

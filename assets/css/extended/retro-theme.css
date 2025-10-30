@@ -1,5 +1,8 @@
 /* Retro Theme - Custom Font with Minimal Style */
 
+/* Import SVG theme variables */
+@import url("./svg-theme-vars.css");
+
 /* Light mode colors */
 :root {
   --theme: #e8ebe8;

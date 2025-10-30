@@ -45,7 +45,7 @@ Now we know that a single file is split into multiple chunks and stored across s
 
 Reads are pretty simple in GFS.
 
-![readflow](/images/2025-10-30-google-file-system/readflow.svg)
+{{< svg "2025-10-30-google-file-system/readflow.svg" >}}
 
 1. The application asks the GFS client, "I want to read this file and this offset."
 2. The GFS client translates the offset into a chunk number and asks the master for the chunk servers from where the client can read this chunk from.
@@ -70,7 +70,7 @@ For me, it was the write part of GFS that was quite a bit confusing... There are
 
 ## Writes at Offset Data Flow
 
-![writeflow](/images/2025-10-30-google-file-system/writeflow.svg)
+{{< svg "2025-10-30-google-file-system/writeflow.svg" >}}
 
 When we have writes, concurrent writes are always the problem... The major solution for concurrent writes is a single source of truth or some sort of leader.
 
@@ -130,7 +130,7 @@ Here is an example.
 
 Let's assume there is a chunk with the following state: 1 2 3 4 5 6 7 8 9 10.
 
-![chunk-state-1.svg](/images/2025-10-30-google-file-system/chunk-state-1.svg)
+{{< svg "2025-10-30-google-file-system/chunk-state-1.svg" >}}
 
 Client A wants to write the data AAAAAAAAAA at an offset 0.
 
@@ -140,14 +140,14 @@ Here, even though these operations are serialized with the help of lease managem
 
 Let's assume Client A's write operation goes first, then Client B's write operation. This would leave the chunk in the following state: `A A A A A B B B B B B`
 
-![chunk-state-2.svg](/images/2025-10-30-google-file-system/chunk-state-2.svg)
+{{< svg "2025-10-30-google-file-system/chunk-state-2.svg" >}}
 
 So, here the state is undefined because even though Client A's write is successful, it does not see all the data it wrote. But this is not the case with record appends.
 
 On concurrent record appends, it is not possible as GFS is not writing the data at an offset but tries to add the data to the end of the file. Again, the writes are ordered by the primary, so all concurrent writes are serialized. Here, let's assume there is enough space in the chunk for both Client A's and Client B's data, and the primary first appends Client B's record, then Client A's record. This would leave the chunk in the following state:
 `1 2 3 4 5 6 7 8 9 10 B B B B B B A A A A A A A A A A`
 
-![chunk-state-3.svg](/images/2025-10-30-google-file-system/chunk-state-3.svg)
+{{< svg "2025-10-30-google-file-system/chunk-state-3.svg" >}}
 
 Here, when the concurrent writes are successful, it leaves the system in a defined state.
 
@@ -161,7 +161,7 @@ The master server periodically scans the metadata, and during these periodic sca
 
 When the heartbeat messages are exchanged and the master notices that the chunks are orphaned, the master tells the chunk servers to delete the chunk.
 
-# Other Parts **of** GFS
+# Other Parts of GFS
 
 ### Heartbeats
 
