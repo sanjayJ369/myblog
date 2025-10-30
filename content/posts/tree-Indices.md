@@ -2,8 +2,8 @@
 title: "Tree Indices"
 date: 2024-06-17
 categories:
-  - Blog
-tags: ["learn", "database"]
+  - Databases
+tags: ["learn", "database", "databases"]
 ---
 
 # Indexes in DBMS

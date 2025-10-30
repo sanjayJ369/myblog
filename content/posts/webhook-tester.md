@@ -2,7 +2,7 @@
 title: "WebHook Tester"
 date: 2024-04-10
 categories:
-  - Blog
+  - Project
 tags: ["go", "network", "project"]
 ---
 

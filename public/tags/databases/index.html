@@ -138,6 +138,20 @@
 
 <article class="post-entry tag-entry"> 
   <header class="entry-header">
+    <h2 class="entry-hint-parent">Google File System
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>Parts of GFS GFS (Google File System) is a reliable distributed file system that is built on top of unreliable commodity machines.
+Commodity machines break down, and they break down pretty often, and given that there are many such machines, at any given moment it is a miracle if all the machines are working fine.
+So, it must constantly monitor itself and detect, tolerate, and recover from component failures regularly....</p>
+  </div>
+  <footer class="entry-footer"><span title='2025-10-30 00:00:00 +0000 UTC'>October 30, 2025</span>&nbsp;·&nbsp;13 min</footer>
+  <a class="entry-link" aria-label="post link to Google File System" href="http://localhost:1313/posts/google-file-system/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
     <h2 class="entry-hint-parent">Map Reduce
     </h2>
   </header>
@@ -147,6 +161,93 @@ Imagine You have some work that can be done by a computer. What do you do? Easy 
   </div>
   <footer class="entry-footer"><span title='2025-05-11 00:00:00 +0000 UTC'>May 11, 2025</span>&nbsp;·&nbsp;13 min</footer>
   <a class="entry-link" aria-label="post link to Map Reduce" href="http://localhost:1313/posts/map-reduce/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Sorting and Aggregates
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>Sorting and Aggregates Sorting What is sorting?
+Sorting is just arranging elements in a specific order. But why is this important for database management systems (DBMS)?
+Why does sorting matter in DBMS?
+DBMS needs sorting for two main reasons:
+SQL uses the ORDER BY clause to return data in a specific order. Sorting helps make query processing more efficient. When records are sorted, operations like joins and ORDER BY can be done faster....</p>
+  </div>
+  <footer class="entry-footer"><span title='2024-10-21 00:00:00 +0000 UTC'>October 21, 2024</span>&nbsp;·&nbsp;8 min</footer>
+  <a class="entry-link" aria-label="post link to Sorting and Aggregates" href="http://localhost:1313/posts/sorting-and-aggregates/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Index Concurrency
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>This blog summaries the lecture 8 of cmu - Intro to Database Systems along with some things i learned on the way.
+Concurrency and Parallelism Parallelism:
+Parallelism means running multiple tasks simultaneously. It can be achieved with the help of multiple cores, multiple threads, GPUs, etc.
+Example: In programming, running two different functions at the same time.
+Concurrency:
+Concurrency refers to the ability to run tasks out of order without changing the final outcome....</p>
+  </div>
+  <footer class="entry-footer"><span title='2024-07-17 00:00:00 +0000 UTC'>July 17, 2024</span>&nbsp;·&nbsp;10 min</footer>
+  <a class="entry-link" aria-label="post link to Index Concurrency" href="http://localhost:1313/posts/index-concurrency/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Tree Indices
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>Indexes in DBMS Indexes are very similar to the index section of a book. In books, indexes tell us where a word has been used and provide the page numbers. Just like that, indexes in a Database Management System (DBMS) tell us on what page or block a particular record is present.
+So why do we need indexes?
+Indexes save us a lot of time. Instead of searching from the start to the end of the book for a specific word, we can simply look up the index and go to the specific pages....</p>
+  </div>
+  <footer class="entry-footer"><span title='2024-06-17 00:00:00 +0000 UTC'>June 17, 2024</span>&nbsp;·&nbsp;15 min</footer>
+  <a class="entry-link" aria-label="post link to Tree Indices" href="http://localhost:1313/posts/tree-indices/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Buffer Pool and Hashing
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>This blog is a continuation of the database systems series, covering Lectures 5 and 6 of the Database Systems CMU 15-445/645 course.
+Buffer Pool The buffer pool is the memory present in the main memory (RAM) that is used to store pages that are most frequently used, similar to a cache. It is managed by the DBMS (buffer pool manager), because the DBMS can do a better job of managing pages than the OS....</p>
+  </div>
+  <footer class="entry-footer"><span title='2024-05-30 00:00:00 +0000 UTC'>May 30, 2024</span>&nbsp;·&nbsp;19 min</footer>
+  <a class="entry-link" aria-label="post link to Buffer Pool and Hashing" href="http://localhost:1313/posts/buffer-pool-manager-and-hashing/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Database Storage
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>This blog is a continuation of the database systems series, covering Lectures 3 and 4 of the Database Systems CMU 15-445/645 course.
+How does a DBMS store data? A DBMS uses disks for data storage and persistence, and there are many storage devices that the database can use to store data.
+Storage Devices Storage devices are devices that are used to store data. There are mainly two types of storage devices: volatile and non-volatile....</p>
+  </div>
+  <footer class="entry-footer"><span title='2024-05-22 00:00:00 +0000 UTC'>May 22, 2024</span>&nbsp;·&nbsp;10 min</footer>
+  <a class="entry-link" aria-label="post link to Database Storage" href="http://localhost:1313/posts/database-storage/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Intro to Database Systems
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>I am currently studying database systems. This blog summarises lectures 1 and 2, as well as the SQL homework from the Database Systems CMU 15-445/645 course.
+It’s fascinating to realize the extent to which we interact with database systems in our daily lives. They’re not just confined to large-scale applications but are also embedded in our browsers and mobile devices. Before the advent of database management systems, data management was complex, with a strong coupling between the data and its management....</p>
+  </div>
+  <footer class="entry-footer"><span title='2024-05-07 00:00:00 +0000 UTC'>May 7, 2024</span>&nbsp;·&nbsp;8 min</footer>
+  <a class="entry-link" aria-label="post link to Intro to Database Systems" href="http://localhost:1313/posts/database-systems-1/"></a>
 </article>
     </main>
     

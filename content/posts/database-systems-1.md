@@ -2,8 +2,8 @@
 title: "Intro to Database Systems"
 date: 2024-05-07
 categories:
-  - Blog
-tags: ["learn", "database", "sql"]
+  - Databases
+tags: ["learn", "database", "databases", "sql"]
 ---
 
 I am currently studying database systems. This blog summarises lectures 1 and 2, as well as the SQL homework from the **[Database Systems](https://15445.courses.cs.cmu.edu/fall2021/)** CMU 15-445/645 course.

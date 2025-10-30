@@ -2,8 +2,8 @@
 title: "Buffer Pool and Hashing"
 date: 2024-05-30
 categories:
-  - Blog
-tags: ["learn", "database"]
+  - Databases
+tags: ["learn", "database", "databases"]
 ---
 
 This blog is a continuation of the database systems series, covering Lectures 5 and 6 of the Database Systems CMU 15-445/645 course.

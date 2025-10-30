@@ -6,8 +6,17 @@
     <description>Recent content in Distributed on Sanjay&#39;s Blog</description>
     <generator>Hugo -- 0.123.7</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 11 May 2025 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 30 Oct 2025 00:00:00 +0000</lastBuildDate>
     <atom:link href="http://localhost:1313/tags/distributed/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Google File System</title>
+      <link>http://localhost:1313/posts/google-file-system/</link>
+      <pubDate>Thu, 30 Oct 2025 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/google-file-system/</guid>
+      <description>Parts of GFS GFS (Google File System) is a reliable distributed file system that is built on top of unreliable commodity machines.
+Commodity machines break down, and they break down pretty often, and given that there are many such machines, at any given moment it is a miracle if all the machines are working fine.
+So, it must constantly monitor itself and detect, tolerate, and recover from component failures regularly.</description>
+    </item>
     <item>
       <title>Map Reduce</title>
       <link>http://localhost:1313/posts/map-reduce/</link>

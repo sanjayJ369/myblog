@@ -2,6 +2,9 @@
 title: "Sorting and Aggregates"
 date: 2024-10-21
 math: true
+categories:
+  - Databases
+tags: ["learn", "database", "databases"]
 ---
 
 # Sorting and Aggregates

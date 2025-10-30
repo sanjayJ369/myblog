@@ -3,7 +3,7 @@ title: "TCP"
 date: 2024-01-21
 categories:
   - Blog
-tags: ["learn", "network"]
+tags: ["learn", "network", "internet"]
 ---
 
 **TCP stands for Transmission Control Protocol.** It's built upon the IP layer and provides features like reliable packet transmission, flow control, congestion control, and congestion avoidance.

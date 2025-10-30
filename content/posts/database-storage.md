@@ -2,8 +2,8 @@
 title: "Database Storage"
 date: 2024-05-22
 categories:
-  - Blog
-tags: ["learn", "database"]
+  - Databases
+tags: ["learn", "database", "databases"]
 ---
 
 This blog is a continuation of the database systems series, covering Lectures 3 and 4 of the Database Systems CMU 15-445/645 course.

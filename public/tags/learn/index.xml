@@ -6,8 +6,17 @@
     <description>Recent content in Learn on Sanjay&#39;s Blog</description>
     <generator>Hugo -- 0.123.7</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 11 May 2025 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 30 Oct 2025 00:00:00 +0000</lastBuildDate>
     <atom:link href="http://localhost:1313/tags/learn/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Google File System</title>
+      <link>http://localhost:1313/posts/google-file-system/</link>
+      <pubDate>Thu, 30 Oct 2025 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/google-file-system/</guid>
+      <description>Parts of GFS GFS (Google File System) is a reliable distributed file system that is built on top of unreliable commodity machines.
+Commodity machines break down, and they break down pretty often, and given that there are many such machines, at any given moment it is a miracle if all the machines are working fine.
+So, it must constantly monitor itself and detect, tolerate, and recover from component failures regularly.</description>
+    </item>
     <item>
       <title>Map Reduce</title>
       <link>http://localhost:1313/posts/map-reduce/</link>
@@ -17,13 +26,15 @@
 Imagine You have some work that can be done by a computer. What do you do? Easy — you just assign the work to your computer. Now the work gets harder, and it’s taking longer to complete. What do you do? Simple — buy a better CPU, GPU, more RAM. Upgrade your computer.</description>
     </item>
     <item>
-      <title>Schedule Tracker</title>
-      <link>http://localhost:1313/posts/schedule-tracker/</link>
-      <pubDate>Wed, 19 Feb 2025 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/posts/schedule-tracker/</guid>
-      <description>Schedule Tracker The main purpose of this project is to digitize the progress tracking I currently do with the help of my diary. Why did I choose this project? It’s fairly simple, and I haven’t built an end-to-end application before (other than the webhook tester). This project will include features like user accounts, logins, authentication, and more.
-Here’s a high-level overview of what I want to achieve:
-Sessions Tracking I usually track my daily progress using sessions.</description>
+      <title>Sorting and Aggregates</title>
+      <link>http://localhost:1313/posts/sorting-and-aggregates/</link>
+      <pubDate>Mon, 21 Oct 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/sorting-and-aggregates/</guid>
+      <description>Sorting and Aggregates Sorting What is sorting?
+Sorting is just arranging elements in a specific order. But why is this important for database management systems (DBMS)?
+Why does sorting matter in DBMS?
+DBMS needs sorting for two main reasons:
+SQL uses the ORDER BY clause to return data in a specific order. Sorting helps make query processing more efficient. When records are sorted, operations like joins and ORDER BY can be done faster.</description>
     </item>
     <item>
       <title>Index Concurrency</title>

@@ -3,30 +3,33 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>http://localhost:1313/categories/</loc>
-    <lastmod>2025-05-11T00:00:00+00:00</lastmod>
+    <lastmod>2025-10-30T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/tags/databases/</loc>
-    <lastmod>2025-05-11T00:00:00+00:00</lastmod>
+    <lastmod>2025-10-30T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/categories/databases/</loc>
-    <lastmod>2025-05-11T00:00:00+00:00</lastmod>
+    <lastmod>2025-10-30T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/tags/distributed/</loc>
-    <lastmod>2025-05-11T00:00:00+00:00</lastmod>
+    <lastmod>2025-10-30T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/posts/google-file-system/</loc>
+    <lastmod>2025-10-30T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/tags/learn/</loc>
-    <lastmod>2025-05-11T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>http://localhost:1313/posts/map-reduce/</loc>
-    <lastmod>2025-05-11T00:00:00+00:00</lastmod>
+    <lastmod>2025-10-30T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/posts/</loc>
-    <lastmod>2025-05-11T00:00:00+00:00</lastmod>
+    <lastmod>2025-10-30T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/</loc>
-    <lastmod>2025-05-11T00:00:00+00:00</lastmod>
+    <lastmod>2025-10-30T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/tags/</loc>
+    <lastmod>2025-10-30T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/posts/map-reduce/</loc>
     <lastmod>2025-05-11T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/tags/project/</loc>
@@ -35,20 +38,17 @@
     <loc>http://localhost:1313/categories/project/</loc>
     <lastmod>2025-02-19T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/tags/schedule-tracker/</loc>
-    <lastmod>2025-02-19T00:00:00+00:00</lastmod>
-  </url><url>
     <loc>http://localhost:1313/posts/schedule-tracker/</loc>
     <lastmod>2025-02-19T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/posts/sorting-and-aggregates/</loc>
-    <lastmod>2024-10-21T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>http://localhost:1313/categories/blog/</loc>
-    <lastmod>2024-07-17T00:00:00+00:00</lastmod>
+    <loc>http://localhost:1313/tags/schedule-tracker/</loc>
+    <lastmod>2025-02-19T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/tags/database/</loc>
-    <lastmod>2024-07-17T00:00:00+00:00</lastmod>
+    <lastmod>2024-10-21T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/posts/sorting-and-aggregates/</loc>
+    <lastmod>2024-10-21T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/posts/index-concurrency/</loc>
     <lastmod>2024-07-17T00:00:00+00:00</lastmod>
@@ -77,6 +77,12 @@
     <loc>http://localhost:1313/posts/webhook-tester/</loc>
     <lastmod>2024-04-10T00:00:00+00:00</lastmod>
   </url><url>
+    <loc>http://localhost:1313/categories/blog/</loc>
+    <lastmod>2024-01-21T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/tags/internet/</loc>
+    <lastmod>2024-01-21T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>http://localhost:1313/posts/tcp/</loc>
     <lastmod>2024-01-21T00:00:00+00:00</lastmod>
   </url><url>
@@ -86,7 +92,13 @@
     <loc>http://localhost:1313/posts/event-modelling/</loc>
     <lastmod>2024-01-12T00:00:00+00:00</lastmod>
   </url><url>
+    <loc>http://localhost:1313/tags/event-modeling/</loc>
+    <lastmod>2024-01-12T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>http://localhost:1313/posts/learn-go-with-tests/</loc>
+    <lastmod>2024-01-03T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/tags/tdd/</loc>
     <lastmod>2024-01-03T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/archives/</loc>

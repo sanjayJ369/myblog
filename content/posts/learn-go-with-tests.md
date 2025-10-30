@@ -3,7 +3,7 @@ title: "learn go with tests"
 date: 2024-01-03
 categories:
   - Blog
-tags: ["learn", "go"]
+tags: ["learn", "go", "tdd"]
 ---
 
 ### Part 1: Introduction

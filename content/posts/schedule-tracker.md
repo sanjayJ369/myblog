@@ -3,7 +3,7 @@ title: "Schedule Tracker"
 date: 2025-02-19
 categories:
   - Project
-tags: ["learn", "schedule tracker", "project"]
+tags: ["schedule-tracker", "project"]
 ---
 
 # Schedule Tracker

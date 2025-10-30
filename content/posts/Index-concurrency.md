@@ -2,8 +2,8 @@
 title: "Index Concurrency"
 date: 2024-07-17
 categories:
-  - Blog
-tags: ["learn", "database"]
+  - Databases
+tags: ["learn", "database", "databases"]
 ---
 
 This blog summaries the [**lecture 8**](https://www.youtube.com/watch?v=jcqGSehrMGU) of cmu - Intro to Database Systems along with some things i learned on the way.

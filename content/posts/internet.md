@@ -3,7 +3,7 @@ title: "internet basics"
 date: 2024-01-16
 categories:
   - Blog
-tags: ["learn", "network"]
+tags: ["learn", "internet", "network"]
 ---
 
 ## How information is sent across the internet?

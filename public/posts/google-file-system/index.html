@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="noindex, nofollow">
+<title>Google File System | Sanjay&#39;s Blog</title>
+<meta name="keywords" content="learn, distributed, databases">
+<meta name="description" content="Parts of GFS GFS (Google File System) is a reliable distributed file system that is built on top of unreliable commodity machines.
+Commodity machines break down, and they break down pretty often, and given that there are many such machines, at any given moment it is a miracle if all the machines are working fine.
+So, it must constantly monitor itself and detect, tolerate, and recover from component failures regularly.">
+<meta name="author" content="">
+<link rel="canonical" href="http://localhost:1313/posts/google-file-system/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.1535157a41060cc8637b6c13233ea1e1b90cc098f9600d7bdfa1c6ea2fcb6f80.css" integrity="sha256-FTUVekEGDMhje2wTIz6h4bkMwJj5YA1736HG6i/Lb4A=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/favicon.webp">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/posts/google-file-system/">
+
+<script>
+    console.log("differe head is being loaded")
+</script>
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="Sanjay&#39;s Blog (Alt + H)">Sanjay&#39;s Blog</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="http://localhost:1313/archives/" title="Archives">
+                    <span>Archives</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="http://localhost:1313/">Home</a>&nbsp;»&nbsp;<a href="http://localhost:1313/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Google File System
+    </h1>
+    <div class="post-meta"><span title='2025-10-30 00:00:00 +0000 UTC'>October 30, 2025</span>&nbsp;·&nbsp;13 min
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#parts-of-gfs" aria-label="Parts of GFS">Parts of GFS</a></li>
+                <li>
+                    <a href="#system-requirements" aria-label="System Requirements">System Requirements</a></li>
+                <li>
+                    <a href="#general-architecture-of-gfs" aria-label="General Architecture Of GFS">General Architecture Of GFS</a><ul>
+                        
+                <li>
+                    <a href="#how-does-gfs-store-data" aria-label="How Does GFS Store Data">How Does GFS Store Data</a></li></ul>
+                </li>
+                <li>
+                    <a href="#read-flow" aria-label="Read Flow">Read Flow</a><ul>
+                        <ul>
+                        
+                <li>
+                    <a href="#handling-failures" aria-label="Handling Failures">Handling Failures</a></li></ul>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#write-flow" aria-label="Write Flow">Write Flow</a><ul>
+                        
+                <li>
+                    <a href="#writes-at-offset-data-flow" aria-label="Writes at Offset Data Flow">Writes at Offset Data Flow</a><ul>
+                        
+                <li>
+                    <a href="#handling-failures-1" aria-label="Handling Failures">Handling Failures</a></li>
+                <li>
+                    <a href="#few-interesting-bits" aria-label="Few Interesting Bits">Few Interesting Bits</a></li></ul>
+                </li>
+                <li>
+                    <a href="#record-append-data-flow" aria-label="Record Append Data Flow">Record Append Data Flow</a><ul>
+                        
+                <li>
+                    <a href="#handling-failures-2" aria-label="Handling Failures">Handling Failures</a></li></ul>
+                </li>
+                <li>
+                    <a href="#concurrent-writes-at-offset-and-record-append-operations" aria-label="Concurrent Writes at Offset and Record Append Operations">Concurrent Writes at Offset and Record Append Operations</a></li></ul>
+                </li>
+                <li>
+                    <a href="#deletion-and-garbage-collection" aria-label="Deletion and Garbage Collection">Deletion and Garbage Collection</a></li>
+                <li>
+                    <a href="#other-parts-of-gfs" aria-label="Other Parts of GFS">Other Parts of GFS</a><ul>
+                        <ul>
+                        
+                <li>
+                    <a href="#heartbeats" aria-label="Heartbeats">Heartbeats</a></li>
+                <li>
+                    <a href="#handling-stale-data" aria-label="Handling Stale Data">Handling Stale Data</a></li></ul>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#the-master" aria-label="The Master….">The Master….</a><ul>
+                        
+                <li>
+                    <a href="#metadata" aria-label="Metadata">Metadata</a></li>
+                <li>
+                    <a href="#operation-logs" aria-label="Operation Logs">Operation Logs</a></li>
+                <li>
+                    <a href="#rebalancing-chunks" aria-label="Rebalancing Chunks">Rebalancing Chunks</a></li></ul>
+                </li>
+                <li>
+                    <a href="#back-to-failures" aria-label="Back to Failures…">Back to Failures…</a></li>
+                <li>
+                    <a href="#one-more-final-interesting-thing" aria-label="One More Final Interesting Thing">One More Final Interesting Thing</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><h1 id="parts-of-gfs">Parts of GFS<a hidden class="anchor" aria-hidden="true" href="#parts-of-gfs">#</a></h1>
+<p>GFS (Google File System) is a reliable distributed file system that is built on top of unreliable commodity machines.</p>
+<p>Commodity machines break down, and they break down pretty often, and given that there are many such machines, at any given moment it is a miracle if all the machines are working fine.</p>
+<p>So, it must constantly monitor itself and detect, tolerate, and recover from component failures regularly.</p>
+<h1 id="system-requirements">System Requirements<a hidden class="anchor" aria-hidden="true" href="#system-requirements">#</a></h1>
+<ul>
+<li><strong>Building Blocks</strong> : As GFS is a file system that is built on top of commodity machines which fail a lot&hellip; it requires constant monitoring, must detect failures, and automatically recover.</li>
+<li><strong>Storage Needs</strong> : The system must be able to store millions of files, and multi-GB files are really common, but it should also support small files.</li>
+<li><strong>WorkLoads</strong>
+<ul>
+<li>Reads : Reads are mostly large sequential reads (major requirement), with a few random reads at a given offset.</li>
+<li>Writes : Mostly appends to a file (major requirement), with ****a few writes at a given offset.</li>
+</ul>
+</li>
+</ul>
+<h1 id="general-architecture-of-gfs">General Architecture Of GFS<a hidden class="anchor" aria-hidden="true" href="#general-architecture-of-gfs">#</a></h1>
+<p>there are mainly two types of servers</p>
+<ul>
+<li><strong>Master Server</strong> : It is like a leader that handles and governs everything. All reads and writes must initially go through the master server. It stores file-to-chunk mapping and chunk-to-chunk-servers mapping.</li>
+<li><strong>Chunk Server</strong> : These are worker server, which store the chunks.</li>
+</ul>
+<h2 id="how-does-gfs-store-data">How Does GFS Store Data<a hidden class="anchor" aria-hidden="true" href="#how-does-gfs-store-data">#</a></h2>
+<p>Say we have to store something really large, of size say 1 TB. We can only store it on a single computer if it has enough storage. And if it does not have enough storage, the next best thing to do is to chop up the file into several chunks and store those chunks on several machines.</p>
+<p>GFS mostly does the same; here a file is stored as several <strong>64 MB</strong> chunks across several servers. The servers which store these chunks are called chunk servers. Also, these chunks are replicated across multiple servers for <strong>high</strong> <strong>availability</strong> and <strong>redundancy</strong>.</p>
+<p>Each chunk is identified by an immutable and globally unique <strong>64-bit chunk handle.</strong></p>
+<blockquote>
+<p>This technique of splitting is very widely used in Virtual Memory in Operating Systems and TCP (fragmentation and reconstruction).</p>
+</blockquote>
+<p>Now we know that a single file is split into multiple chunks and stored across several servers. So how do reads, writes, and deletes work in GFS??</p>
+<h1 id="read-flow">Read Flow<a hidden class="anchor" aria-hidden="true" href="#read-flow">#</a></h1>
+<p>Reads are pretty simple in GFS.</p>
+<p><img loading="lazy" src="/images/2025-10-30-google-file-system/readflow.svg" alt="readflow"  />
+</p>
+<ol>
+<li>The application asks the GFS client, &ldquo;I want to read this file and this offset.&rdquo;</li>
+<li>The GFS client translates the offset into a chunk number and asks the master for the chunk servers from where the client can read this chunk from.</li>
+<li>The master server returns a set of chunk servers corresponding to the chunk along with the chunk handle.</li>
+<li>The client then asks those chunk servers for the chunk.</li>
+<li>Finally&hellip;!! The chunk will be transferred from the chunk server to the client.</li>
+</ol>
+<p>That’s for the happy path…</p>
+<h3 id="handling-failures"><strong>Handling Failures</strong><a hidden class="anchor" aria-hidden="true" href="#handling-failures">#</a></h3>
+<p>Here, the major failure occurs when the chunk server is down. In that case, the client can just ask another chunk server for the chunk, as the master server would have shared the location of all the chunk servers where the chunk is stored.</p>
+<h1 id="write-flow">Write Flow<a hidden class="anchor" aria-hidden="true" href="#write-flow">#</a></h1>
+<p>It is the writes that are complex&hellip; There are different types of writes:</p>
+<ul>
+<li><strong>Writes</strong>: Data to be written at a specific offset.</li>
+<li><strong>Record Appends</strong>: Append record (data) to the file.</li>
+</ul>
+<p>For me, it was the write part of GFS that was quite a bit confusing&hellip; There are many variables here: what if the write is greater than chunk size, what if the write fails, and so on.</p>
+<h2 id="writes-at-offset-data-flow">Writes at Offset Data Flow<a hidden class="anchor" aria-hidden="true" href="#writes-at-offset-data-flow">#</a></h2>
+<p><img loading="lazy" src="/images/2025-10-30-google-file-system/writeflow.svg" alt="writeflow"  />
+</p>
+<p>When we have writes, concurrent writes are always the problem&hellip; The major solution for concurrent writes is a single source of truth or some sort of leader.</p>
+<p>Each chunk is replicated across multiple chunk servers, and to handle these writes across multiple chunk servers, the master uses a technique called <strong>lease management,</strong> where one of the chunk servers acts as primary and others act as secondary. To edit that chunk, the write command must pass through the primary replica.</p>
+<p>When a client wants to write at a particular offset in a file:</p>
+<ol>
+<li>The client first asks the master for the chunk servers.</li>
+<li>The master gives the client the chunk handle and chunk server locations.</li>
+<li>Once the client knows about the primary and secondary chunk servers, The client starts sharing the data to be written with all the chunk servers.
+<ul>
+<li>Here, as you see in the diagram, the file is first sent to the secondary server A, and the secondary server A then sends data to the primary server, and again, the primary server sends data to the next secondary server B. Here the data is shared in a <strong>pipeline</strong> fashion in order to maximize the network bandwidth. The client shares the data with the server that is closest to it (here, it is the secondary server A), and then the chunk server shares the data with another chunk server that is closest to it, and so on…</li>
+<li>It&rsquo;s not like the secondary server A waits for the entire data to be transferred and then sends it to the next server. It would be very slow. As soon as it has some data, it starts pushing it to the next server.</li>
+<li>The chunk servers will not yet commit these writes but will just store them in an LRU Buffer Cache.</li>
+</ul>
+</li>
+<li>Once the data transfer is complete, the client receives an acknowledgment for the data transfer from all the chunk servers.</li>
+<li>Then the client issues a write command to the primary chunk server. Here, there can be multiple concurrent writes happening, but the primary chunk server gives these writes an order. It is just like saying, &ldquo;You go first, you go second, and you go third,&rdquo; and so on…</li>
+<li>Then it applies the writes to its chunk in the given order, and it then tells other secondary servers to do the same.</li>
+<li>Secondary replicas acknowledge the writes to the primary replica.</li>
+<li>Finally, the primary replica sends an acknowledgment to the client, concluding the write successfully.</li>
+</ol>
+<p>Now all the chunk servers have the writes in the same order. And that&rsquo;s the happy path. And many things can go wrong here, like the primary chunk server might fail, or the secondary chunk servers might fail, or the chunk might get corrupted, and so on.…</p>
+<h3 id="handling-failures-1"><strong>Handling Failures</strong><a hidden class="anchor" aria-hidden="true" href="#handling-failures-1">#</a></h3>
+<p>Here the main solution for handling failures is <strong>retrying</strong> the operation again and again. Primary replica fails&hellip; retry. Secondary replica fails&hellip; retry.…
+Retries would not be a problem, as writes at a particular offset would not lead to duplication even on retries. That is because here the client is trying to edit the same region again and again. Failures would just leave the chunk in an undefined state; however, a successful retry would just overwrite it with defined data.</p>
+<h3 id="few-interesting-bits">Few Interesting Bits<a hidden class="anchor" aria-hidden="true" href="#few-interesting-bits">#</a></h3>
+<p>GFS separates control flow and data flow, where data flow is the transfer of data between the servers and control flow is like the issuing of commands, requests, or giving instructions.</p>
+<p>This separation allows multiple clients to transfer files (data flow) to chunk servers without blocking one another, as the actual write takes place only when the primary chunk server issues a write command (control flow).</p>
+<h2 id="record-append-data-flow">Record Append Data Flow<a hidden class="anchor" aria-hidden="true" href="#record-append-data-flow">#</a></h2>
+<p>In an append record flow, the client just gives GFS the data to be written, and GFS appends it and gives back the client the offset where it wrote.</p>
+<p>Record append is similar to the write flow, but here, the chunk is just the last chunk of the file. GFS has a few extra steps in order to guarantee atomicity even when there are concurrent writers, such as the maximum size of the record being limited to 16 MB; this is to reduce fragmentation.</p>
+<p>In the record append data flow, similar to the write operation, the client sends the data to the primary and the secondary chunk servers. When the client issues the append operation to the primary chunk server, the primary chunk server first checks if it fits in the current chunk. If it does, then the record is written, and its offset is returned to the client.</p>
+<p>If the record does not fit in, then the primary chunk server pads the data, asks secondary servers to do the same, and asks the client to retry on the next chunk. Now the client retries by asking the master for the next chunk, which does not exist yet. So the master allocates a new chunk and replies to the client with the new chunk. Now the data is written in the new chunk.</p>
+<h3 id="handling-failures-2">Handling Failures<a hidden class="anchor" aria-hidden="true" href="#handling-failures-2">#</a></h3>
+<p>Here, just like with writes at offset and reads&hellip; the way of handling failures is retries. But the catch here is that, unlike writes at an offset, record appends lead to duplicates, but given the workload of the system, it is generally fine, and the GFS client can also be configured to handle duplicates.</p>
+<blockquote>
+<p>GFS promises that record append writes to the chunks at least once.</p>
+</blockquote>
+<h2 id="concurrent-writes-at-offset-and-record-append-operations">Concurrent Writes at Offset and Record Append Operations<a hidden class="anchor" aria-hidden="true" href="#concurrent-writes-at-offset-and-record-append-operations">#</a></h2>
+<p>Concurrent writes at offset might leave the chunk in an undefined but consistent state, but that is not quite the case for record appends here.</p>
+<ul>
+<li>Consistent state ⇒ all the chunk servers see the same data.</li>
+<li>Defined state ⇒ a client sees what it writes</li>
+</ul>
+<p>Here is an example.</p>
+<p>Let&rsquo;s assume there is a chunk with the following state: 1 2 3 4 5 6 7 8 9 10.</p>
+<p><img loading="lazy" src="/images/2025-10-30-google-file-system/chunk-state-1.svg" alt="chunk-state-1.svg"  />
+</p>
+<p>Client A wants to write the data AAAAAAAAAA at an offset 0.</p>
+<p>Client B wants to write BBBBBB at offset 5.</p>
+<p>Here, even though these operations are serialized with the help of lease management, it still leads to an undefined state.</p>
+<p>Let&rsquo;s assume Client A&rsquo;s write operation goes first, then Client B&rsquo;s write operation. This would leave the chunk in the following state: <code>A A A A A B B B B B B</code></p>
+<p><img loading="lazy" src="/images/2025-10-30-google-file-system/chunk-state-2.svg" alt="chunk-state-2.svg"  />
+</p>
+<p>So, here the state is undefined because even though Client A&rsquo;s write is successful, it does not see all the data it wrote. But this is not the case with record appends.</p>
+<p>On concurrent record appends, it is not possible as GFS is not writing the data at an offset but tries to add the data to the end of the file. Again, the writes are ordered by the primary, so all concurrent writes are serialized. Here, let&rsquo;s assume there is enough space in the chunk for both Client A&rsquo;s and Client B&rsquo;s data, and the primary first appends Client B&rsquo;s record, then Client A&rsquo;s record. This would leave the chunk in the following state:
+<code>1 2 3 4 5 6 7 8 9 10 B B B B B B A A A A A A A A A A</code></p>
+<p><img loading="lazy" src="/images/2025-10-30-google-file-system/chunk-state-3.svg" alt="chunk-state-3.svg"  />
+</p>
+<p>Here, when the concurrent writes are successful, it leaves the system in a defined state.</p>
+<p>Along with reads and writes, there are many parts of GFS that keep the system up and running…</p>
+<h1 id="deletion-and-garbage-collection">Deletion and Garbage Collection<a hidden class="anchor" aria-hidden="true" href="#deletion-and-garbage-collection">#</a></h1>
+<p>Deletion and Garbage Collection Deletion in GFS is a bit interesting. It just renames the file name to a hidden name. The name includes the timestamp of the deletion, and it is kept in the metadata for some time, like 3 days by default (configurable). During this duration, the file can be recovered.</p>
+<p>The master server periodically scans the metadata, and during these periodic scans of the file system, if the hidden file is older than 3 days, it deletes it from the metadata (remember, chunks in the chunk servers are not yet deleted), making all the chunks of the file orphan, i.e., not reachable.</p>
+<p>When the heartbeat messages are exchanged and the master notices that the chunks are orphaned, the master tells the chunk servers to delete the chunk.</p>
+<h1 id="other-parts-of-gfs">Other Parts <strong>of</strong> GFS<a hidden class="anchor" aria-hidden="true" href="#other-parts-of-gfs">#</a></h1>
+<h3 id="heartbeats">Heartbeats<a hidden class="anchor" aria-hidden="true" href="#heartbeats">#</a></h3>
+<p>The master and the chunk servers communicate periodically through heartbeat messages. These messages are really important, as the states of the chunk servers and commands to the chunk servers are all piggybacked onto these heartbeat messages.</p>
+<h3 id="handling-stale-data">Handling Stale Data<a hidden class="anchor" aria-hidden="true" href="#handling-stale-data">#</a></h3>
+<p>So&hellip; what if a chunk server goes down, a write happens, and after a long time the chunk server comes back up? Now the chunk server holds stale data. How is this handled?</p>
+<p>Stale data is handled by using a version number. Each chunk is given a version number, which is incremented during mutations, i.e., writes or record appends.</p>
+<p>It is through the heartbeats that a chunk server tells the master about the chunks that it has and the versions of the chunks.</p>
+<p>The master notices that other chunk servers holding the same chunk handle have a newer version. It simply considers the chunk to not exist at all, making it an orphan chunk which will be removed during garbage collection, and it issues re-replication in order to maintain the replication factor of the chunk.</p>
+<h1 id="the-master">The Master….<a hidden class="anchor" aria-hidden="true" href="#the-master">#</a></h1>
+<h2 id="metadata">Metadata<a hidden class="anchor" aria-hidden="true" href="#metadata">#</a></h2>
+<p>The master stores the following metadata:</p>
+<ul>
+<li>File and chunk namespaces</li>
+<li>The mapping from files to chunks</li>
+<li>Location of chunk replicas</li>
+</ul>
+<p>File and chunk namespaces and the mapping of files to chunks. This metadata is persisted by logging changes to the operation log.</p>
+<h2 id="operation-logs"><strong>Operation Logs</strong><a hidden class="anchor" aria-hidden="true" href="#operation-logs">#</a></h2>
+<p>The operation log is similar to WAL (Write-Ahead Log) in databases: before making any changes, first write to disk, make the change, and reply to the client.</p>
+<p>The operation log is also replicated to other servers for redundancy so that whenever the master goes down, when it comes back up, it replays the operation log to recover the state of the &ldquo;file and chunk namespace&rdquo; and &ldquo;files to chunks mappings.”</p>
+<p>o speed up recovery, it uses checkpointing. A checkpoint is like a snapshot of namespaces and file-to-chunk mappings. Whenever the size of the log is greater than a certain threshold, the master switches to a new log file and, along with it, creates a new checkpoint in another thread.</p>
+<blockquote>
+<p>These structures are designed in such a way that a new checkpoint can be created without delaying incoming mutations.</p>
+</blockquote>
+<p>So&hellip; whenever it comes back up, it should only replay a few logs from the most recent checkpoint.</p>
+<p>Additionally, the master also does a lot of things, such as rebalancing chunks by moving them to different chunk servers.</p>
+<h2 id="rebalancing-chunks">Rebalancing Chunks<a hidden class="anchor" aria-hidden="true" href="#rebalancing-chunks">#</a></h2>
+<p>There are several things the master considers regarding chunk placements:</p>
+<ul>
+<li>All chunks must be placed on different racks.</li>
+<li>It places chunks on chunk servers with below-average disk utilization.</li>
+<li>Place the chunks on chunk servers which do not have any recent writes/chunk placements.</li>
+</ul>
+<h1 id="back-to-failures">Back to Failures…<a hidden class="anchor" aria-hidden="true" href="#back-to-failures">#</a></h1>
+<p>Now, getting back to failures, what if a chunk gets corrupted??</p>
+<p>Here, to determine the integrity of the chunk, <strong>checksums</strong> are used. Every 64 KB has a 32-bit checksum.</p>
+<p>There are mainly two ways in which the chunk server finds out it has corrupted chunks:</p>
+<ol>
+<li>During Regular Chunk Scanning ⇒ The chunk server regularly scans the chunks for their integrity.</li>
+<li>During Client Reads ⇒ When a client wants to read a chunk, the chunk server first checks the checksums before sending the chunk to the client.</li>
+</ol>
+<p>During these scenarios, if the chunk server finds out that the chunk is corrupted, it tells the master, and the master issues a replication from another chunk server.</p>
+<p>Now&hellip; what if a chunk server fails??</p>
+<p>When a chunk server fails, it does not send heartbeat messages. The master notices the absence of heartbeats, which decreases the replication factor of the chunks belonging to that chunk server, and now to maintain the replication factor of the chunks (here, replication factor just means how many replicas of the chunk should be present), the master server creates a new replica of the chunk.</p>
+<h1 id="one-more-final-interesting-thing">One More Final Interesting Thing<a hidden class="anchor" aria-hidden="true" href="#one-more-final-interesting-thing">#</a></h1>
+<p>Here, in order to maintain high availability, GFS uses something called a shadow server. GFS maintains a shadow master server. As the name implies, the shadow master server is a bit stale.</p>
+<p>This shadow master server serves the Read Operation when the master is down and it also keeps itself up to date by reading the operation logs of the master server. This shadow master server greatly improves read availability when the master goes down.</p>
+<p>GFS looks really simple, but it&rsquo;s quite complex with so many moving parts. Hope you enjoyed the read and now better understand GFS. Next up is the RAFT consensus algorithm.</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="http://localhost:1313/tags/learn/">Learn</a></li>
+      <li><a href="http://localhost:1313/tags/distributed/">Distributed</a></li>
+      <li><a href="http://localhost:1313/tags/databases/">Databases</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="next" href="http://localhost:1313/posts/map-reduce/">
+    <span class="title">Next »</span>
+    <br>
+    <span>Map Reduce</span>
+  </a>
+</nav>
+
+
+<ul class="share-buttons">
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Google File System on x"
+            href="https://x.com/intent/tweet/?text=Google%20File%20System&amp;url=http%3a%2f%2flocalhost%3a1313%2fposts%2fgoogle-file-system%2f&amp;hashtags=learn%2cdistributed%2cdatabases">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M512 62.554 L 512 449.446 C 512 483.97 483.97 512 449.446 512 L 62.554 512 C 28.03 512 0 483.97 0 449.446 L 0 62.554 C 0 28.03 28.029 0 62.554 0 L 449.446 0 C 483.971 0 512 28.03 512 62.554 Z M 269.951 190.75 L 182.567 75.216 L 56 75.216 L 207.216 272.95 L 63.9 436.783 L 125.266 436.783 L 235.9 310.383 L 332.567 436.783 L 456 436.783 L 298.367 228.367 L 432.367 75.216 L 371.033 75.216 Z M 127.633 110 L 164.101 110 L 383.481 400.065 L 349.5 400.065 Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Google File System on linkedin"
+            href="https://www.linkedin.com/shareArticle?mini=true&amp;url=http%3a%2f%2flocalhost%3a1313%2fposts%2fgoogle-file-system%2f&amp;title=Google%20File%20System&amp;summary=Google%20File%20System&amp;source=http%3a%2f%2flocalhost%3a1313%2fposts%2fgoogle-file-system%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-288.985,423.278l0,-225.717l-75.04,0l0,225.717l75.04,0Zm270.539,0l0,-129.439c0,-69.333 -37.018,-101.586 -86.381,-101.586c-39.804,0 -57.634,21.891 -67.617,37.266l0,-31.958l-75.021,0c0.995,21.181 0,225.717 0,225.717l75.02,0l0,-126.056c0,-6.748 0.486,-13.492 2.474,-18.315c5.414,-13.475 17.767,-27.434 38.494,-27.434c27.135,0 38.007,20.707 38.007,51.037l0,120.768l75.024,0Zm-307.552,-334.556c-25.674,0 -42.448,16.879 -42.448,39.002c0,21.658 16.264,39.002 41.455,39.002l0.484,0c26.165,0 42.452,-17.344 42.452,-39.002c-0.485,-22.092 -16.241,-38.954 -41.943,-39.002Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Google File System on reddit"
+            href="https://reddit.com/submit?url=http%3a%2f%2flocalhost%3a1313%2fposts%2fgoogle-file-system%2f&title=Google%20File%20System">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-3.446,265.638c0,-22.964 -18.616,-41.58 -41.58,-41.58c-11.211,0 -21.361,4.457 -28.841,11.666c-28.424,-20.508 -67.586,-33.757 -111.204,-35.278l18.941,-89.121l61.884,13.157c0.756,15.734 13.642,28.29 29.56,28.29c16.407,0 29.706,-13.299 29.706,-29.701c0,-16.403 -13.299,-29.702 -29.706,-29.702c-11.666,0 -21.657,6.792 -26.515,16.578l-69.105,-14.69c-1.922,-0.418 -3.939,-0.042 -5.585,1.036c-1.658,1.073 -2.811,2.761 -3.224,4.686l-21.152,99.438c-44.258,1.228 -84.046,14.494 -112.837,35.232c-7.468,-7.164 -17.589,-11.591 -28.757,-11.591c-22.965,0 -41.585,18.616 -41.585,41.58c0,16.896 10.095,31.41 24.568,37.918c-0.639,4.135 -0.99,8.328 -0.99,12.576c0,63.977 74.469,115.836 166.33,115.836c91.861,0 166.334,-51.859 166.334,-115.836c0,-4.218 -0.347,-8.387 -0.977,-12.493c14.564,-6.47 24.735,-21.034 24.735,-38.001Zm-119.474,108.193c-20.27,20.241 -59.115,21.816 -70.534,21.816c-11.428,0 -50.277,-1.575 -70.522,-21.82c-3.007,-3.008 -3.007,-7.882 0,-10.889c3.003,-2.999 7.882,-3.003 10.885,0c12.777,12.781 40.11,17.317 59.637,17.317c19.522,0 46.86,-4.536 59.657,-17.321c3.016,-2.999 7.886,-2.995 10.885,0.008c3.008,3.011 3.003,7.882 -0.008,10.889Zm-5.23,-48.781c-16.373,0 -29.701,-13.324 -29.701,-29.698c0,-16.381 13.328,-29.714 29.701,-29.714c16.378,0 29.706,13.333 29.706,29.714c0,16.374 -13.328,29.698 -29.706,29.698Zm-160.386,-29.702c0,-16.381 13.328,-29.71 29.714,-29.71c16.369,0 29.689,13.329 29.689,29.71c0,16.373 -13.32,29.693 -29.689,29.693c-16.386,0 -29.714,-13.32 -29.714,-29.693Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Google File System on facebook"
+            href="https://facebook.com/sharer/sharer.php?u=http%3a%2f%2flocalhost%3a1313%2fposts%2fgoogle-file-system%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-106.468,0l0,-192.915l66.6,0l12.672,-82.621l-79.272,0l0,-53.617c0,-22.603 11.073,-44.636 46.58,-44.636l36.042,0l0,-70.34c0,0 -32.71,-5.582 -63.982,-5.582c-65.288,0 -107.96,39.569 -107.96,111.204l0,62.971l-72.573,0l0,82.621l72.573,0l0,192.915l-191.104,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Google File System on whatsapp"
+            href="https://api.whatsapp.com/send?text=Google%20File%20System%20-%20http%3a%2f%2flocalhost%3a1313%2fposts%2fgoogle-file-system%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-58.673,127.703c-33.842,-33.881 -78.847,-52.548 -126.798,-52.568c-98.799,0 -179.21,80.405 -179.249,179.234c-0.013,31.593 8.241,62.428 23.927,89.612l-25.429,92.884l95.021,-24.925c26.181,14.28 55.659,21.807 85.658,21.816l0.074,0c98.789,0 179.206,-80.413 179.247,-179.243c0.018,-47.895 -18.61,-92.93 -52.451,-126.81Zm-126.797,275.782l-0.06,0c-26.734,-0.01 -52.954,-7.193 -75.828,-20.767l-5.441,-3.229l-56.386,14.792l15.05,-54.977l-3.542,-5.637c-14.913,-23.72 -22.791,-51.136 -22.779,-79.287c0.033,-82.142 66.867,-148.971 149.046,-148.971c39.793,0.014 77.199,15.531 105.329,43.692c28.128,28.16 43.609,65.592 43.594,105.4c-0.034,82.149 -66.866,148.983 -148.983,148.984Zm81.721,-111.581c-4.479,-2.242 -26.499,-13.075 -30.604,-14.571c-4.105,-1.495 -7.091,-2.241 -10.077,2.241c-2.986,4.483 -11.569,14.572 -14.182,17.562c-2.612,2.988 -5.225,3.364 -9.703,1.12c-4.479,-2.241 -18.91,-6.97 -36.017,-22.23c-13.314,-11.876 -22.304,-26.542 -24.916,-31.026c-2.612,-4.484 -0.279,-6.908 1.963,-9.14c2.016,-2.007 4.48,-5.232 6.719,-7.847c2.24,-2.615 2.986,-4.484 4.479,-7.472c1.493,-2.99 0.747,-5.604 -0.374,-7.846c-1.119,-2.241 -10.077,-24.288 -13.809,-33.256c-3.635,-8.733 -7.327,-7.55 -10.077,-7.688c-2.609,-0.13 -5.598,-0.158 -8.583,-0.158c-2.986,0 -7.839,1.121 -11.944,5.604c-4.105,4.484 -15.675,15.32 -15.675,37.364c0,22.046 16.048,43.342 18.287,46.332c2.24,2.99 31.582,48.227 76.511,67.627c10.685,4.615 19.028,7.371 25.533,9.434c10.728,3.41 20.492,2.929 28.209,1.775c8.605,-1.285 26.499,-10.833 30.231,-21.295c3.732,-10.464 3.732,-19.431 2.612,-21.298c-1.119,-1.869 -4.105,-2.99 -8.583,-5.232Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Google File System on telegram"
+            href="https://telegram.me/share/url?text=Google%20File%20System&amp;url=http%3a%2f%2flocalhost%3a1313%2fposts%2fgoogle-file-system%2f">
+            <svg version="1.1" xml:space="preserve" viewBox="2 2 28 28" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M26.49,29.86H5.5a3.37,3.37,0,0,1-2.47-1,3.35,3.35,0,0,1-1-2.47V5.48A3.36,3.36,0,0,1,3,3,3.37,3.37,0,0,1,5.5,2h21A3.38,3.38,0,0,1,29,3a3.36,3.36,0,0,1,1,2.46V26.37a3.35,3.35,0,0,1-1,2.47A3.38,3.38,0,0,1,26.49,29.86Zm-5.38-6.71a.79.79,0,0,0,.85-.66L24.73,9.24a.55.55,0,0,0-.18-.46.62.62,0,0,0-.41-.17q-.08,0-16.53,6.11a.59.59,0,0,0-.41.59.57.57,0,0,0,.43.52l4,1.24,1.61,4.83a.62.62,0,0,0,.63.43.56.56,0,0,0,.4-.17L16.54,20l4.09,3A.9.9,0,0,0,21.11,23.15ZM13.8,20.71l-1.21-4q8.72-5.55,8.78-5.55c.15,0,.23,0,.23.16a.18.18,0,0,1,0,.06s-2.51,2.3-7.52,6.8Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Google File System on ycombinator"
+            href="https://news.ycombinator.com/submitlink?t=Google%20File%20System&u=http%3a%2f%2flocalhost%3a1313%2fposts%2fgoogle-file-system%2f">
+            <svg version="1.1" xml:space="preserve" width="30px" height="30px" viewBox="0 0 512 512" fill="currentColor"
+                xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape">
+                <path
+                    d="M449.446 0C483.971 0 512 28.03 512 62.554L512 449.446C512 483.97 483.97 512 449.446 512L62.554 512C28.03 512 0 483.97 0 449.446L0 62.554C0 28.03 28.029 0 62.554 0L449.446 0ZM183.8767 87.9921H121.8427L230.6673 292.4508V424.0079H281.3328V292.4508L390.1575 87.9921H328.1233L256 238.2489z" />
+            </svg>
+        </a>
+    </li>
+</ul>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2025 <a href="http://localhost:1313/">Sanjay&#39;s Blog</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
