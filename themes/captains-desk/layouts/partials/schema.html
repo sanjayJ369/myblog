@@ -1,0 +1,33 @@
+{{- /* JSON-LD structured data so search engines can show posts as articles */}}
+{{- $author := dict "@type" "Person" "name" site.Params.author "url" site.Home.Permalink }}
+{{- if .IsHome }}
+{{- $data := dict
+  "@context" "https://schema.org"
+  "@type" "WebSite"
+  "name" site.Title
+  "url" site.Home.Permalink
+  "description" site.Params.description
+  "inLanguage" site.Language.LanguageCode
+  "author" $author
+}}
+<script type="application/ld+json">{{ $data | jsonify | safeJS }}</script>
+{{- else if and .IsPage (in site.Params.mainSections .Section) }}
+{{- $desc := .Description | default (.Summary | plainify | htmlUnescape | truncate 160) }}
+{{- $data := dict
+  "@context" "https://schema.org"
+  "@type" "BlogPosting"
+  "headline" .Title
+  "description" $desc
+  "url" .Permalink
+  "mainEntityOfPage" (dict "@type" "WebPage" "@id" .Permalink)
+  "datePublished" (.PublishDate.Format "2006-01-02T15:04:05Z07:00")
+  "dateModified" (.Lastmod.Format "2006-01-02T15:04:05Z07:00")
+  "wordCount" .WordCount
+  "inLanguage" site.Language.LanguageCode
+  "keywords" (delimit (.Params.tags | default slice) ", ")
+  "author" $author
+  "publisher" $author
+  "isPartOf" (dict "@type" "Blog" "name" site.Title "url" site.Home.Permalink)
+}}
+<script type="application/ld+json">{{ $data | jsonify | safeJS }}</script>
+{{- end }}

@@ -1,14 +1,22 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-{{- if hugo.IsProduction }}
-<meta name="robots" content="index, follow">
-{{- else }}
+{{- if not hugo.IsProduction }}
 <meta name="robots" content="noindex, nofollow">
+{{- else if or .Params.noindex (eq .Kind "404") }}
+<meta name="robots" content="noindex, follow">
+{{- else }}
+<meta name="robots" content="index, follow, max-image-preview:large">
 {{- end }}
 <title>{{ if .IsHome }}{{ site.Title }}{{ else }}{{ .Title }} · {{ site.Title }}{{ end }}</title>
-<meta name="description" content="{{ with .Description }}{{ . }}{{ else }}{{ if .IsPage }}{{ .Summary | plainify | truncate 160 }}{{ else }}{{ site.Params.description }}{{ end }}{{ end }}">
+<meta name="description" content="{{ with .Description }}{{ . }}{{ else }}{{ if .IsPage }}{{ .Summary | plainify | htmlUnescape | truncate 160 }}{{ else }}{{ site.Params.description }}{{ end }}{{ end }}">
 <meta name="author" content="{{ site.Params.author }}">
 <link rel="canonical" href="{{ .Permalink }}">
+{{- with site.Params.googleSiteVerification }}
+<meta name="google-site-verification" content="{{ . }}">
+{{- end }}
+{{- with site.Params.bingSiteVerification }}
+<meta name="msvalidate.01" content="{{ . }}">
+{{- end }}
 <meta name="theme-color" content="#ebdab8" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#1b140c" media="(prefers-color-scheme: dark)">
 {{- /* apply a saved light/dark choice before first paint */}}
@@ -28,5 +36,6 @@
 {{- if hugo.IsProduction }}
 {{- template "_internal/opengraph.html" . }}
 {{- template "_internal/twitter_cards.html" . }}
+{{- partial "schema.html" . }}
 {{- template "_internal/google_analytics.html" . }}
 {{- end }}

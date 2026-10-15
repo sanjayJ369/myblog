@@ -27,6 +27,10 @@ params:
   description: "Long-form notes on databases, distributed systems and networks, written while learning."
   favicon: favicon.webp
   mainSections: ["posts"]
+  # Search engine ownership checks. Paste the content="..." value from
+  # Google Search Console / Bing Webmaster Tools to verify the site.
+  googleSiteVerification: ""
+  bingSiteVerification: ""
 
   home:
     title: "Notes from my <em>readings.</em>"
