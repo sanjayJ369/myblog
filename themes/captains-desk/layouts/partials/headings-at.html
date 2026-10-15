@@ -1,0 +1,10 @@
+{{- /* Flattens a Fragments heading tree to the headings at one level. Args: nodes, level. */}}
+{{- $out := slice }}
+{{- range .nodes }}
+  {{- if eq .Level $.level }}
+    {{- $out = $out | append . }}
+  {{- else if lt .Level $.level }}
+    {{- range partial "headings-at.html" (dict "nodes" .Headings "level" $.level) }}{{ $out = $out | append . }}{{ end }}
+  {{- end }}
+{{- end }}
+{{- return $out }}

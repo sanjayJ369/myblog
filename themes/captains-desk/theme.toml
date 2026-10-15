@@ -1,0 +1,4 @@
+name = "Captain's Desk"
+license = "MIT"
+description = "Warm paper, engraved type, dot-matrix labels and 1-bit dithered details. Built for blog.sanjayj.dev; see DESIGN.md at the repo root."
+min_version = "0.123.0"

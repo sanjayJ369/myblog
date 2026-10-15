@@ -1,0 +1,2 @@
+{{- /* Regular pages in the main sections, newest first. Returns a page collection. */}}
+{{- return (where site.RegularPages "Section" "in" site.Params.mainSections).ByDate.Reverse }}

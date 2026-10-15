@@ -1,0 +1,16 @@
+{{ define "main" }}
+<header class="page-head">
+  {{- $name := .Data.Plural | humanize }}
+  <div class="crumbs"><a href="{{ site.Home.RelPermalink }}">Index</a> / {{ $name }}</div>
+  <h1 class="page-title">{{ $name }}</h1>
+  <p class="dek">Subjects in alphabetical order. Pick one to see its entries.</p>
+</header>
+<div class="tag-index">
+  {{- $letter := "" }}
+  {{- range .Data.Terms.Alphabetical }}
+  {{- $first := substr .Page.LinkTitle 0 1 | upper }}
+  {{- if ne $first $letter }}{{ $letter = $first }}<span class="tag-letter">{{ $letter }}</span>{{ end }}
+  <a class="tag-row" href="{{ .Page.RelPermalink }}"><span>#{{ .Page.LinkTitle }}</span><span class="dots"></span><span class="tag-n">{{ .Count }}</span></a>
+  {{- end }}
+</div>
+{{ end }}

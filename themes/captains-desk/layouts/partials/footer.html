@@ -1,0 +1,4 @@
+<footer class="site">
+  <span>© {{ now.Year }} {{ site.Params.author }}</span>
+  <span>built with Hugo{{ with site.Home.OutputFormats.Get "rss" }} · <a href="{{ .RelPermalink }}">rss</a>{{ end }}</span>
+</footer>

@@ -1,0 +1,8 @@
+# Images that are photos or screenshots, not drawings.
+# The theme shows every other post image as "ink on paper" (white melts into the page,
+# and it inverts in dark mode); images listed here are shown as-is.
+# Paths are exactly as written in the post's Markdown.
+- /images/2025-2-19-schedule-tracker/image.png
+- /images/2025-2-19-schedule-tracker/image-1.png
+- /images/2025-2-19-schedule-tracker/image-2.png
+- /images/2024-4-10-wehook-tester/CLIDemo.png

@@ -1,0 +1,43 @@
+{{ define "main" }}
+{{- $posts := partial "posts.html" . }}
+<section class="plate win" aria-label="Masthead">
+  <div class="winbar" aria-hidden="true"><i></i><span>globe.png</span></div>
+  <canvas id="plate" width="320" height="120" role="img" aria-label="A dithered 1-bit globe"></canvas>
+</section>
+
+<section class="intro">
+  <h1>{{ site.Params.home.title | default site.Title | safeHTML }}</h1>
+  <div>
+    {{ site.Params.home.intro | markdownify }}
+    {{- with site.Params.socialIcons }}
+    <div class="links">
+      {{- range . }}<a href="{{ .url }}" rel="me noopener">{{ .name }} ↗</a>{{ end }}
+      {{- with site.Home.OutputFormats.Get "rss" }}<a href="{{ .RelPermalink }}">rss</a>{{ end }}
+    </div>
+    {{- end }}
+  </div>
+</section>
+
+<div class="dither-rule" aria-hidden="true"></div>
+<div class="sec-head"><h2>The Manifest</h2><span>entries, newest first</span></div>
+<div class="ledger-scroll">
+  <table class="ledger">
+    <thead><tr><th>No.</th><th>Date</th><th>Entry</th><th class="min">Read</th></tr></thead>
+    <tbody>
+      {{- $total := len $posts }}
+      {{- range $i, $p := $posts }}
+      {{- if or (eq $i 0) (ne $p.Date.Year (index $posts (sub $i 1)).Date.Year) }}
+      <tr class="year"><td colspan="4">Anno {{ $p.Date.Year }}</td></tr>
+      {{- end }}
+      <tr>
+        <td class="no">{{ printf "%03d" (sub $total $i) }}</td>
+        <td class="date">{{ $p.Date.Format "02 Jan" | upper }}</td>
+        <td class="title"><a href="{{ $p.RelPermalink }}">{{ $p.Title }}</a>
+          {{- with $p.Params.tags }}<span class="tags">{{ range . }}#{{ . }}  {{ end }}</span>{{ end }}</td>
+        <td class="min">{{ $p.ReadingTime }} min</td>
+      </tr>
+      {{- end }}
+    </tbody>
+  </table>
+</div>
+{{ end }}

@@ -1,0 +1,6 @@
+{{- $lang := .Type | default "text" }}
+{{- $name := .Attributes.file | default .Attributes.title | default $lang }}
+<div class="win code-win">
+  <div class="winbar"><i aria-hidden="true"></i><span>{{ $name }}</span><button class="copy" type="button" hidden>copy</button></div>
+  {{ transform.Highlight .Inner $lang .Options }}
+</div>

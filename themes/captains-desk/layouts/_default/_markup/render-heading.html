@@ -1,0 +1,7 @@
+{{- /* The post's top heading level becomes an engraved, §-numbered <h2>; deeper levels shift with it.
+       Built as one string because Go templates escape a dynamic tag name. */}}
+{{- $top := partial "top-level.html" .Page }}
+{{- $depth := sub .Level $top }}
+{{- $n := int (math.Min 6 (math.Max 2 (add $depth 2))) }}
+{{- $class := cond (le $depth 0) "sec" (cond (eq $depth 1) "sub" "subsub") }}
+{{- printf `<h%d id="%s" class="%s">%s</h%d>` $n (.Anchor | htmlEscape) $class .Text $n | safeHTML }}

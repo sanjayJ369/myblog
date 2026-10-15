@@ -1,0 +1,24 @@
+{{ define "main" }}
+<header class="page-head">
+  <div class="crumbs"><a href="{{ site.Home.RelPermalink }}">Index</a> / {{ .Title }}</div>
+  <h1 class="page-title">{{ .Title }}</h1>
+</header>
+<div class="win search-win">
+  <div class="winbar" aria-hidden="true"><i></i><span>Find</span></div>
+  <div class="search-box">
+    <label for="q" class="sr">Search entries</label>
+    <span class="prompt" aria-hidden="true">&gt;</span>
+    <input id="q" type="search" autocomplete="off" spellcheck="false" placeholder="titles, tags, summaries">
+    <kbd class="hint" aria-hidden="true">/</kbd>
+  </div>
+</div>
+<p class="search-count" id="search-count" aria-live="polite"></p>
+<ol class="results" id="results"
+    data-index="{{ with site.Home.OutputFormats.Get "json" }}{{ .RelPermalink }}{{ end }}"
+    data-tags="{{ with site.GetPage "/tags" }}{{ .RelPermalink }}{{ end }}"></ol>
+<noscript><p class="search-count">Search needs JavaScript. Browse the <a href="{{ "archives/" | relURL }}">archives</a> or <a href="{{ "tags/" | relURL }}">tags</a> instead.</p></noscript>
+{{ end }}
+{{ define "scripts" }}
+{{- $s := resources.Get "js/search.js" | minify | fingerprint }}
+<script src="{{ $s.RelPermalink }}" integrity="{{ $s.Data.Integrity }}" defer></script>
+{{ end }}

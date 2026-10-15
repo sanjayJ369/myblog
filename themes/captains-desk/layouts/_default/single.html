@@ -1,0 +1,42 @@
+{{ define "main" }}
+{{- $top := partial "top-level.html" . }}
+{{- $secs := partial "headings-at.html" (dict "nodes" .Fragments.Headings "level" $top) }}
+{{- $asc := (partial "posts.html" .).ByDate }}
+{{- $no := 0 }}{{ $prev := false }}{{ $next := false }}
+{{- range $i, $p := $asc }}
+  {{- if eq $p.RelPermalink $.RelPermalink }}
+    {{- $no = add $i 1 }}
+    {{- if gt $i 0 }}{{ $prev = index $asc (sub $i 1) }}{{ end }}
+    {{- if lt (add $i 1) (len $asc) }}{{ $next = index $asc (add $i 1) }}{{ end }}
+  {{- end }}
+{{- end }}
+<article class="article">
+  {{- if and (gt (len $secs) 1) (ne .Params.toc false) }}
+  <aside class="side">
+    <nav class="toc" aria-label="On this page">
+      <span class="toc-label">On this page</span>
+      <ol>
+        {{- range $secs }}
+        <li><a href="#{{ .ID }}">{{ .Title | plainify }}</a></li>
+        {{- end }}
+      </ol>
+    </nav>
+  </aside>
+  {{- end }}
+  <div class="crumbs"><a href="{{ site.Home.RelPermalink }}">Index</a> / {{ .Section | humanize }}{{ with $no }} / No. {{ printf "%03d" . }}{{ end }}</div>
+  <h1 class="post-title">{{ .Title }}</h1>
+  {{- with .Description }}<p class="dek">{{ . }}</p>{{ end }}
+  <div class="meta-row">
+    <span>{{ .Date.Format "02 Jan 2006" | upper }}</span>
+    <span>{{ .ReadingTime }} MIN · {{ lang.FormatNumber 0 .WordCount }} WORDS</span>
+    {{- with .GetTerms "tags" }}<span>{{ range . }}<a href="{{ .RelPermalink }}">#{{ .LinkTitle }}</a> {{ end }}</span>{{ end }}
+  </div>
+  <div class="prose">
+    {{ .Content }}
+  </div>
+  <nav class="post-nav" aria-label="More entries">
+    {{- with $prev }}<a href="{{ .RelPermalink }}"><small>← Older</small><span>{{ .Title }}</span></a>{{ end }}
+    {{- with $next }}<a href="{{ .RelPermalink }}"><small>Newer →</small><span>{{ .Title }}</span></a>{{ else }}<a href="{{ site.Home.RelPermalink }}"><small>Index →</small><span>All entries</span></a>{{ end }}
+  </nav>
+</article>
+{{ end }}

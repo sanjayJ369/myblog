@@ -1,0 +1,16 @@
+{{- $alt := .PlainText }}
+{{- $src := .Destination | safeURL }}
+{{- /* drawings blend into the paper; photos and screenshots (data/photos.yaml) stay as they are */}}
+{{- $kind := cond (in (site.Data.photos | default slice) .Destination) "photo" "ink" }}
+{{- if .IsBlock }}
+<figure class="img-fig">
+  <div class="win">
+    <div class="winbar" aria-hidden="true"><i></i><span>{{ path.Base .Destination | replaceRE "%20" " " }}</span></div>
+    <img class="{{ $kind }}" src="{{ $src }}" alt="{{ $alt }}" loading="lazy" decoding="async">
+  </div>
+  {{- with .Title }}<figcaption>{{ . }}</figcaption>
+  {{- else }}{{ with $alt }}{{ if not (findRE `(?i)\.(png|jpe?g|gif|webp|svg)$` .) }}<figcaption>{{ . }}</figcaption>{{ end }}{{ end }}{{ end }}
+</figure>
+{{- else -}}
+<img src="{{ $src }}" alt="{{ $alt }}"{{ with .Title }} title="{{ . }}"{{ end }} loading="lazy" decoding="async">
+{{- end -}}
