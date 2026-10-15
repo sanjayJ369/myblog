@@ -20,7 +20,8 @@
     }
     const re = new RegExp(rx(term), "i");
     const hits = posts.filter(p => re.test(p.title + " " + p.tags.join(" ") + " " + p.summary));
-    const hl = s => esc(s).replace(new RegExp(rx(esc(term)), "gi"), m => `<mark>${m}</mark>`);
+    // split the raw text on matches, then escape each piece, so highlighting never cuts an HTML entity
+    const hl = s => s.split(new RegExp(`(${rx(term)})`, "gi")).map((part, i) => (i % 2 ? `<mark>${esc(part)}</mark>` : esc(part))).join("");
     cnt.textContent = `${hits.length} ${hits.length === 1 ? "result" : "results"} for “${term}”`;
     out.innerHTML = hits.map(p => {
       const d = p.date.split("-");

@@ -1,5 +1,14 @@
-{{- /* The shallowest heading level used in a post's Markdown (code fences ignored). Posts written with "#" get 1. */}}
+{{- /* A post's "section" heading level: the shallowest level used more than once
+       (a lone "# Title" followed by "###" sections gives 3). Code fences are ignored. */}}
 {{- $md := replaceRE "(?s)```.*?```|~~~.*?~~~" "" .RawContent }}
-{{- $top := 2 }}
-{{- if findRE `(?m)^#\s` $md 1 }}{{ $top = 1 }}{{ else if not (findRE `(?m)^##\s` $md 1) }}{{ $top = 3 }}{{ end }}
-{{- return $top }}
+{{- $top := 0 }}
+{{- range $l := seq 6 }}
+  {{- if not $top }}
+    {{- $n := len (findRE (printf `(?m)^#{%d}\s` $l) $md) }}
+    {{- if ge $n 2 }}{{ $top = $l }}{{ end }}
+  {{- end }}
+{{- end }}
+{{- if not $top }}
+  {{- range $l := seq 6 }}{{ if and (not $top) (findRE (printf `(?m)^#{%d}\s` $l) $md 1) }}{{ $top = $l }}{{ end }}{{ end }}
+{{- end }}
+{{- return (cond (gt $top 0) $top 2) }}

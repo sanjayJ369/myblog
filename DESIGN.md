@@ -28,7 +28,7 @@ All colours are CSS custom properties on `:root` in `assets/css/main.css`. Compo
 | `--paper-2` | `#e1cda5` | `#261c11` | Inline code, maths blocks, hover rows |
 | `--ink` | `#24190f` | `#ecd9b1` | Text, rules, frames, dither dots |
 | `--ink-soft` | `#56432e` | `#c2a77c` | Secondary text, captions, strings in code |
-| `--ink-faint` | `#957e5c` | `#85704f` | Tags, comments in code, placeholders |
+| `--ink-faint` | `#6b573c` | `#a38c68` | Tags, comments in code, placeholders (kept at 4.5:1 or better) |
 | `--rule` | `#c4aa80` | `#42331f` | Dotted row dividers, leaders |
 | `--mark` | `#9b3517` | `#e27d4e` | The one accent: entry numbers, §, drop cap, keywords, selection |
 
@@ -73,9 +73,10 @@ Modelled on the Cloudflare blog:
 
 ### Headings
 
-Posts may start their sections with `#` or `##`. The heading render hook finds the post's top level and renders
-it as an `<h2 class="sec">`, numbered `§1, §2…` by a CSS counter; deeper levels shift down with it. The TOC lists
-the same top-level headings.
+Posts may write sections as `#`, `##` or `###`. The section level is the shallowest heading level used more than
+once; the heading render hook turns it into an `<h2 class="sec">`, numbered `§1, §2…` by a CSS counter, and deeper
+levels shift down with it. A lone heading above that level (a `# Title` over `###` sections) becomes an unnumbered
+lead. The "On this page" rail lists the section headings when there are at least two.
 
 ## Structure and components
 
