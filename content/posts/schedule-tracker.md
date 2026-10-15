@@ -27,13 +27,13 @@ Currently, I track my sessions and daily session counts manually. With the data 
 
 ![image.png](/images/2025-2-19-schedule-tracker/image.png)
 
-![image.png](/images/2025-2-19-schedule-tracker/image%201.png)
+![image.png](/images/2025-2-19-schedule-tracker/image-1.png)
 
 ### **Miscellaneous Goals**
 
 In addition to tracking sessions, I also want to track specific goals like meditation, gym workouts, etc. Users will be able to define multiple goals and keep track of progress for each one.
 
-![image.png](/images/2025-2-19-schedule-tracker/image%202.png)
+![image.png](/images/2025-2-19-schedule-tracker/image-2.png)
 
 I plan to create a system similar to GitHub’s contribution graph, where reaching more goals results in more green squares.
 
