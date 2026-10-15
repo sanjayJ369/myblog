@@ -221,7 +221,8 @@ table.ledger { width: 100%; border-collapse: collapse; font-variant-numeric: tab
 /* the top heading level of each post is its "section": engraved, numbered with § */
 .prose .sec { font-family: var(--f-display); font-size: 2rem; line-height: 1.1; margin: 2.6rem 0 .7rem; counter-increment: sec; }
 .prose .sec::before { content: "§" counter(sec); font-family: var(--f-label); font-size: 1.05rem; color: var(--mark); margin-right: .6rem; vertical-align: .25em; }
-.prose .lead { font-family: var(--f-display); font-size: 2.2rem; line-height: 1.1; margin: 0 0 1rem; }
+.prose .lead { font-family: var(--f-display); font-size: 2.2rem; line-height: 1.1; margin: 2.8rem 0 1rem; }
+.prose > .lead:first-child { margin-top: 0; }
 .prose .sub { font-family: var(--f-display-sc); font-size: 1.3rem; letter-spacing: .04em; margin: 2rem 0 .5rem; }
 .prose .subsub { font-family: var(--f-display); font-style: italic; font-size: 1.2rem; margin: 1.8rem 0 .4rem; }
 .prose ol, .prose ul { padding-left: 1.4rem; margin: 0 0 1.2rem; }

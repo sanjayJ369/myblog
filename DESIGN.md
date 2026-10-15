@@ -28,7 +28,7 @@ All colours are CSS custom properties on `:root` in `assets/css/main.css`. Compo
 | `--paper-2` | `#e1cda5` | `#261c11` | Inline code, maths blocks, hover rows |
 | `--ink` | `#24190f` | `#ecd9b1` | Text, rules, frames, dither dots |
 | `--ink-soft` | `#56432e` | `#c2a77c` | Secondary text, captions, strings in code |
-| `--ink-faint` | `#6b573c` | `#a38c68` | Tags, comments in code, placeholders (kept at 4.5:1 or better) |
+| `--ink-faint` | `#6b573c` | `#a38c68` | Tags, comments in code, placeholders (4.5:1 or better on `--paper`) |
 | `--rule` | `#c4aa80` | `#42331f` | Dotted row dividers, leaders |
 | `--mark` | `#9b3517` | `#e27d4e` | The one accent: entry numbers, §, drop cap, keywords, selection |
 

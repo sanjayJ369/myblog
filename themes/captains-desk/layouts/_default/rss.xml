@@ -1,6 +1,6 @@
 {{- /* Like Hugo's built-in feed, but only posts (no Archives/Search pages). */ -}}
 {{- $pages := partial "posts.html" . -}}
-{{- if not .IsHome }}{{ $pages = .RegularPages.ByDate.Reverse }}{{ end -}}
+{{- if eq .Kind "taxonomy" }}{{ $pages = .Pages }}{{ else if not .IsHome }}{{ $pages = .RegularPages.ByDate.Reverse }}{{ end -}}
 {{- $limit := site.Config.Services.RSS.Limit -}}
 {{- if ge $limit 1 }}{{ $pages = $pages | first $limit }}{{ end -}}
 {{- printf "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>" | safeHTML }}
