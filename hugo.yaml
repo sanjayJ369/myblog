@@ -31,9 +31,8 @@ params:
   home:
     title: "Notes from my <em>readings.</em>"
     intro: >
-      I write long-form notes while I learn how storage engines, file systems and networks
-      actually work, from buffer pools and B+ trees to GFS and MapReduce. Most entries follow
-      a lecture or a paper and try to explain it plainly.
+      I write here when I learn something and want to understand it properly. These are my
+      notes from lectures and papers, mostly on databases, distributed systems and networking.
 
 
       Away from the keyboard I make 3D art and play chess.
