@@ -1,0 +1,11 @@
+{{- $out := slice }}
+{{- range partial "posts.html" . }}
+{{- $out = $out | append (dict
+    "title" .Title
+    "permalink" .RelPermalink
+    "date" (.Date.Format "2006-01-02")
+    "tags" (.Params.tags | default slice)
+    "minutes" .ReadingTime
+    "summary" (.Summary | plainify | htmlUnescape | truncate 220)) }}
+{{- end }}
+{{- $out | jsonify }}

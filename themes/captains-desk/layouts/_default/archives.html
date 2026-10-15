@@ -1,0 +1,43 @@
+{{ define "main" }}
+{{- $posts := partial "posts.html" . }}
+{{- $asc := $posts.ByDate }}
+<header class="page-head">
+  <div class="crumbs"><a href="{{ site.Home.RelPermalink }}">Index</a> / {{ .Title }}</div>
+  <h1 class="page-title">{{ .Title }}</h1>
+  {{- with $asc }}<p class="dek">Every entry, month by month, since {{ (index . 0).Date.Format "January 2006" }}.</p>{{ end }}
+</header>
+{{- with $asc }}
+{{- $first := (index . 0).Date.Year }}
+{{- $nowKey := now.Format "2006-01" }}
+<div class="win activity-win">
+  <div class="winbar" aria-hidden="true"><i></i><span>entries per month</span></div>
+  <div class="activity">
+    {{- range $y := seq $first now.Year }}
+    <div class="act-row"><span class="act-year">{{ $y }}</span><div class="act-cells">
+      {{- range $m := seq 12 }}
+      {{- $key := printf "%d-%02d" $y $m }}
+      {{- $n := 0 }}{{ range $posts }}{{ if eq (.Date.Format "2006-01") $key }}{{ $n = add $n 1 }}{{ end }}{{ end }}
+      {{- $future := gt $key $nowKey }}
+      {{- $month := (time (printf "%s-01" $key)).Format "January" }}
+      <span class="act-cell" data-l="{{ if $future }}f{{ else if ge $n 3 }}3{{ else }}{{ $n }}{{ end }}" title="{{ $month }} {{ $y }}: {{ if $future }}not yet{{ else }}{{ $n }} {{ cond (eq $n 1) "entry" "entries" }}{{ end }}"><b></b><i>{{ substr $month 0 1 }}</i></span>
+      {{- end }}
+    </div></div>
+    {{- end }}
+    <div class="act-legend"><span><b data-l="0"></b>0</span><span><b data-l="1"></b>1</span><span><b data-l="2"></b>2</span><span><b data-l="3"></b>3+</span></div>
+  </div>
+</div>
+{{- end }}
+{{- range $posts.GroupByDate "2006" }}
+<section class="arch-year">
+  <h2><span>{{ .Key }}</span><small>{{ len .Pages }} {{ cond (eq (len .Pages) 1) "entry" "entries" }}</small></h2>
+  <ol class="arch-list">
+    {{- $mo := "" }}
+    {{- range .Pages }}
+    {{- $m := .Date.Format "January" }}
+    <li><span class="arch-month">{{ if ne $m $mo }}{{ $m }}{{ end }}</span><span class="arch-day">{{ .Date.Format "02" }}</span><a href="{{ .RelPermalink }}">{{ .Title }}</a><span class="arch-min">{{ .ReadingTime }} min</span></li>
+    {{- $mo = $m }}
+    {{- end }}
+  </ol>
+</section>
+{{- end }}
+{{ end }}

@@ -1,38 +1,14 @@
+{{- /* Inline an SVG from static/images so it can read the theme's --svg-* colour tokens.
+       Usage: {{< svg "folder/file.svg" >}} or {{< svg "folder/file.svg" "Caption" >}} */}}
 {{- $svg := .Get 0 -}}
 {{- if not $svg -}}
-  {{- errorf "svg shortcode: missing SVG path" -}}
+  {{- errorf "svg shortcode: missing SVG path in %s" .Position -}}
 {{- end -}}
-{{- $basePath := printf "/images/%s" $svg -}}
-{{- $content := readFile (printf "static%s" $basePath) -}}
-
-<div class="svg-container" style="display: inline-block;">
-  {{- $content | safeHTML -}}
-</div>
-
-<style>
-  .svg-container {
-    --svg-text-primary: var(--primary, #1e1e1e);
-    --svg-text-secondary: var(--secondary, #4a5a52);
-    --svg-bg-light: var(--theme, #ffffff);
-    --svg-bg-subtle: var(--entry, #f3f3f3);
-    --svg-border: var(--border, #bcc3bc);
-    --svg-accent-1: #d73a49;
-    --svg-accent-2: var(--tertiary, #6b7b73);
-  }
-
-  .dark .svg-container {
-    --svg-text-primary: var(--primary, #c8e6c9);
-    --svg-text-secondary: var(--secondary, #a5d6a7);
-    --svg-bg-light: var(--theme, #1e293b);
-    --svg-bg-subtle: var(--entry, #0f172a);
-    --svg-border: var(--border, #334155);
-    --svg-accent-1: #ff7b72;
-    --svg-accent-2: var(--tertiary, #66bb6a);
-  }
-
-  .svg-container svg {
-    max-width: 100%;
-    height: auto;
-    display: block;
-  }
-</style>
+{{- $content := readFile (printf "static/images/%s" $svg) -}}
+<figure class="svg-fig">
+  <div class="win">
+    <div class="winbar" aria-hidden="true"><i></i><span>{{ path.Base $svg }}</span></div>
+    <div class="svg-scroll">{{ $content | replaceRE `<\?xml[^>]*\?>|<!DOCTYPE[^>]*>` "" | safeHTML }}</div>
+  </div>
+  {{- with .Get 1 }}<figcaption>{{ . }}</figcaption>{{ end }}
+</figure>

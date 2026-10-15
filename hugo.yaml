@@ -1,11 +1,11 @@
 baseURL: https://blog.sanjayj.dev/
 languageCode: en-us
 title: Sanjay's Blog
-theme: ["PaperMod"]
+theme: captains-desk # local theme in themes/captains-desk; design language in DESIGN.md
 googleAnalytics: "G-M5Y3YNK58R"
 buildFuture: true
-paginate: 10
-mainSections: ["posts"]
+capitalizeListTitles: false # keep tag names lower-case, as written
+enableRobotsTXT: true
 
 menu:
   main:
@@ -13,51 +13,47 @@ menu:
       name: Archives
       url: /archives/
       weight: 10
-    - identifier: Search
-      name: Search
-      url: /search/
-      weight: 20
     - identifier: Tags
       name: Tags
       url: /tags/
+      weight: 20
+    - identifier: Search
+      name: Search
+      url: /search/
       weight: 30
 
 params:
-  defaultTheme: auto
-  ShowShareButtons: true
-  ShowReadingTime: true
-  displayFullLangName: true
-  ShowPostNavLinks: true
-  ShowBreadCrumbs: true
-  ShowCodeCopyButtons: true
-  ShowRssButtonInSectionTermList: true
-  ShowAllPagesInArchive: true
-  ShowPageNums: true
-  ShowToc: true
-  comments: true
+  author: Sanjay J.
+  description: "Long-form notes on databases, distributed systems and networks, written while learning."
+  favicon: favicon.webp
+  mainSections: ["posts"]
 
-  assets:
-    favicon: "favicon.webp"
+  home:
+    title: "Notes from my <em>readings.</em>"
+    intro: >
+      I write here when I learn something and want to understand it properly. These are my
+      notes from lectures and papers, mostly on databases, distributed systems and networking.
 
-  homeInfoParams:
-    Title: "Hi, I am Sanjay J"
-    Content: >
-      - I am a Computer Science Engineering student with an interest in programming, particularly web development.
 
-      - Currently, I am pursuing my B.E. in Computer Science Engineering, I am currently focused on expanding my programming skill set.
-
-      - Beyond coding, I like to do 3D art and also play chess
-
-      - I invite you to explore [my work](https://sanjayj.dev).
+      Away from the keyboard I make 3D art and play chess.
 
   socialIcons:
     - name: github
       url: "https://github.com/sanjayJ369"
-    - name: my site
+    - name: sanjayj.dev
       url: "https://sanjayj.dev"
+
+markup:
+  goldmark:
+    parser:
+      wrapStandAloneImageWithinParagraph: false # lets the image render hook emit <figure> for block images
+  highlight:
+    noClasses: false # Chroma emits classes; colours come from the theme tokens
+    codeFences: true
+    guessSyntax: false
 
 outputs:
   home:
     - HTML
     - RSS
-    - JSON # necessary for search
+    - JSON # search index, read by themes/captains-desk/assets/js/search.js

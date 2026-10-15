@@ -1,0 +1,19 @@
+{{- $posts := partial "posts.html" . }}
+{{- $current := .RelPermalink }}
+<header>
+  <div class="bar">
+    <a class="brand" href="{{ site.Home.RelPermalink }}">{{ site.Params.author }}</a>
+    <nav aria-label="Main">
+      <a href="{{ site.Home.RelPermalink }}"{{ if .IsHome }} aria-current="page"{{ end }}>Index</a>
+      {{- range site.Menus.main }}
+      <a href="{{ .URL | relURL }}"{{ if hasPrefix $current (.URL | relURL) }} aria-current="page"{{ end }}>{{ .Name }}</a>
+      {{- end }}
+      <button class="toggle" id="sound-btn" type="button" aria-pressed="false" aria-label="Sound effects" hidden>♪ Off</button>
+      <button class="toggle" id="theme-btn" type="button" aria-label="Switch between light and dark" hidden>◐ Ink</button>
+    </nav>
+  </div>
+  <div class="subbar">
+    <span>{{ (urls.Parse site.BaseURL).Host | default site.Title }}</span>
+    <span>{{ len $posts }} entries{{ with $posts.ByDate }} · est. {{ (index . 0).Date.Year }}{{ end }}</span>
+  </div>
+</header>

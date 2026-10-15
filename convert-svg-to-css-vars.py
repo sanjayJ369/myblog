@@ -247,7 +247,7 @@ def generate_css_file(output_path: str, accent_colors: set) -> None:
         print(f"✗ Error writing CSS file: {e}")
 
 def main():
-    workspace_root = Path("/mnt/bd35e3c5-97dd-4f09-b8e4-b939a3398e0b/coding/repos/myblog")
+    workspace_root = Path(__file__).resolve().parent
     static_dir = workspace_root / "static/images"
     
     svg_files = list(static_dir.rglob("*.svg"))
@@ -284,10 +284,10 @@ def main():
         if success:
             success_count += 1
     
-    # Generate CSS
+    # The --svg-* colours are defined by the theme (themes/captains-desk/assets/css/main.css),
+    # mapped onto its palette tokens, so no CSS file is generated any more. See DESIGN.md.
     print(f"\n{'-'*60}")
-    css_output = workspace_root / "assets/css/extended/svg-theme-vars.css"
-    generate_css_file(str(css_output), accent_colors)
+    print("Colours come from the theme's --svg-* tokens; no CSS file generated.")
     
     print(f"\n{'='*60}")
     print(f"✓ Successfully converted {success_count}/{len(svg_files)} files")

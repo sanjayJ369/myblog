@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="{{ site.Language.LanguageCode | default "en" }}">
+<head>
+  {{- partial "head.html" . }}
+</head>
+<body>
+  <a class="visually-hidden skip" href="#main">Skip to content</a>
+  <canvas id="progress" aria-hidden="true" hidden></canvas>
+  <canvas id="trail" aria-hidden="true" hidden></canvas>
+  <div class="wrap">
+    {{- partial "header.html" . }}
+    <main id="main">
+      {{- block "main" . }}{{ end }}
+    </main>
+    {{- partial "footer.html" . }}
+  </div>
+  <button class="to-top" id="to-top" type="button" aria-label="Back to top">▲ TOP</button>
+  {{- $js := resources.Get "js/main.js" | minify | fingerprint }}
+  <script src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}" defer></script>
+  {{- block "scripts" . }}{{ end }}
+</body>
+</html>
