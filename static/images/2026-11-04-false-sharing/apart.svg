@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 660 360" width="660" height="360" role="img" aria-label="After the fix: the counter and the CRC settings are on different cache lines. Thread B's increment invalidates only the counter's line in core A, so core A keeps reading its settings without stalling.">
+<style>
+  .fs2 text { font-family: "JetBrains Mono", ui-monospace, monospace; }
+  .fs2 .lbl { font-size: 13px; }
+  .fs2 .sm { font-size: 11px; }
+  .fs2 .ttl { font-size: 15px; font-weight: 600; }
+  .fs2-writeB { animation: fs2-write 6s infinite; }
+  .fs2-inv { animation: fs2-inv 6s infinite; opacity: 0; }
+  .fs2-ok { animation: fs2-ok 6s infinite; opacity: 0; }
+  .fs2-bar { transform-box: fill-box; transform-origin: left center; animation: fs2-bar 6s infinite linear; }
+  .fs2-bclone { animation: fs2-bclone 6s infinite; opacity: 0; }
+  @keyframes fs2-write { 0%,18% { opacity: 0; } 20%,30% { opacity: 1; } 34%,100% { opacity: 0; } }
+  @keyframes fs2-inv { 0%,21% { opacity: 0; } 23%,55% { opacity: 1; } 58%,100% { opacity: 0; } }
+  @keyframes fs2-ok { 0%,21% { opacity: 0; } 23%,55% { opacity: 1; } 58%,100% { opacity: 0; } }
+  @keyframes fs2-bar { 0% { transform: scaleX(0); } 100% { transform: scaleX(1); } }
+  @keyframes fs2-bclone { 0%,17% { opacity: 0; } 19%,34% { opacity: 1; } 37%,100% { opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) {
+    .fs2-writeB, .fs2-inv, .fs2-ok, .fs2-bclone { animation: none; opacity: 1; }
+    .fs2-bar { animation: none; transform: scaleX(.6); }
+  }
+</style>
+<defs>
+  <pattern id="fs2-hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+    <rect width="8" height="8" fill="var(--svg-bg-light)"/>
+    <line x1="0" y1="0" x2="0" y2="8" stroke="var(--svg-accent-1)" stroke-width="3"/>
+  </pattern>
+  <pattern id="fs2-pad" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+    <rect width="6" height="6" fill="var(--svg-bg-light)"/>
+    <line x1="0" y1="0" x2="0" y2="6" stroke="var(--svg-border)" stroke-width="1.5"/>
+  </pattern>
+</defs>
+<g class="fs2">
+  <!-- Core A -->
+  <rect x="10" y="10" width="300" height="340" rx="6" fill="none" stroke="var(--svg-text-primary)" stroke-width="1.5"/>
+  <text x="26" y="38" class="ttl" fill="var(--svg-text-primary)">Core A · thread A</text>
+  <text x="26" y="70" class="sm" fill="var(--svg-text-secondary)">line 0: the counters</text>
+  <rect x="26" y="78" width="54" height="40" fill="var(--svg-bg-subtle)" stroke="var(--svg-text-primary)"/>
+  <text x="53" y="103" class="sm" text-anchor="middle" fill="var(--svg-text-primary)">strong</text>
+  <rect x="80" y="78" width="54" height="40" fill="var(--svg-bg-subtle)" stroke="var(--svg-text-primary)"/>
+  <text x="107" y="103" class="sm" text-anchor="middle" fill="var(--svg-text-primary)">weak</text>
+  <rect x="134" y="78" width="160" height="40" fill="url(#fs2-pad)" stroke="var(--svg-border)"/>
+  <text x="214" y="103" class="sm" text-anchor="middle" fill="var(--svg-text-secondary)">padding</text>
+  <g class="fs2-inv">
+    <rect x="26" y="78" width="268" height="40" fill="url(#fs2-hatch)" stroke="var(--svg-accent-1)" stroke-width="2"/>
+    <rect x="104" y="88" width="112" height="22" fill="var(--svg-bg-light)"/>
+    <text x="160" y="104" class="lbl" text-anchor="middle" fill="var(--svg-accent-1)" font-weight="600">INVALID</text>
+  </g>
+  <text x="26" y="146" class="sm" fill="var(--svg-text-secondary)">line 2: the CRC settings</text>
+  <rect x="26" y="154" width="268" height="40" fill="var(--svg-bg-light)" stroke="var(--svg-text-primary)"/>
+  <text x="160" y="179" class="sm" text-anchor="middle" fill="var(--svg-text-primary)">CRC settings</text>
+  <text x="160" y="214" class="sm fs2-ok" text-anchor="middle" fill="var(--svg-text-primary)" font-weight="600">still valid</text>
+  <text x="26" y="252" class="lbl" fill="var(--svg-text-primary)">CRC run: reading settings…</text>
+  <rect x="26" y="266" width="268" height="12" fill="var(--svg-bg-subtle)" stroke="var(--svg-border)"/>
+  <rect x="26" y="266" width="268" height="12" class="fs2-bar" fill="var(--svg-text-primary)"/>
+  <text x="26" y="300" class="sm" fill="var(--svg-text-secondary)">checksum progress: no stall</text>
+
+  <!-- Core B -->
+  <rect x="350" y="10" width="300" height="340" rx="6" fill="none" stroke="var(--svg-text-primary)" stroke-width="1.5"/>
+  <text x="366" y="38" class="ttl" fill="var(--svg-text-primary)">Core B · thread B</text>
+  <text x="366" y="70" class="sm" fill="var(--svg-text-secondary)">line 0: the counters</text>
+  <rect x="366" y="78" width="54" height="40" fill="var(--svg-bg-subtle)" stroke="var(--svg-text-primary)"/>
+  <text x="393" y="103" class="sm" text-anchor="middle" fill="var(--svg-text-primary)">strong</text>
+  <rect x="366" y="78" width="54" height="40" class="fs2-writeB" fill="var(--svg-accent-1)"/>
+  <text x="393" y="103" class="sm fs2-writeB" text-anchor="middle" fill="var(--svg-bg-light)" font-weight="600">+1</text>
+  <rect x="420" y="78" width="54" height="40" fill="var(--svg-bg-subtle)" stroke="var(--svg-text-primary)"/>
+  <text x="447" y="103" class="sm" text-anchor="middle" fill="var(--svg-text-primary)">weak</text>
+  <rect x="474" y="78" width="160" height="40" fill="url(#fs2-pad)" stroke="var(--svg-border)"/>
+  <text x="554" y="103" class="sm" text-anchor="middle" fill="var(--svg-text-secondary)">padding</text>
+  <text x="366" y="146" class="sm" fill="var(--svg-text-secondary)">line 2: the CRC settings</text>
+  <rect x="366" y="154" width="268" height="40" fill="var(--svg-bg-light)" stroke="var(--svg-text-primary)"/>
+  <text x="500" y="179" class="sm" text-anchor="middle" fill="var(--svg-text-primary)">CRC settings</text>
+  <text x="366" y="252" class="lbl" fill="var(--svg-text-primary)">reads its next page</text>
+  <text x="366" y="276" class="lbl fs2-bclone" fill="var(--svg-accent-1)" font-weight="600">Arc::clone → strong += 1</text>
+</g>
+</svg>
