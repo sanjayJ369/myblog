@@ -2,8 +2,6 @@
 title: "False Sharing: When Four Threads Were Slower Than One"
 date: 2026-11-04
 draft: false
-build:
-  list: never
 categories:
   - Databases
 tags: ["learn", "database", "databases", "rust", "performance"]
