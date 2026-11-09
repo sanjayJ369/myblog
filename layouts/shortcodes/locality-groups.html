@@ -1,0 +1,134 @@
+{{- /* Interactive demo for the Bigtable post: reading one column family from a single
+       SSTable vs. from its own locality group. Usage: {{< locality-groups >}} */ -}}
+<style>
+  .lg { margin: 2rem 0; border: 1px solid var(--rule); background: var(--paper-2); padding: 16px; font-family: var(--f-label); font-size: 17px; color: var(--ink);
+    --lg-auth: rgba(201,42,42,.22); --lg-auth-b: #c92a2a; --lg-profile: rgba(43,138,62,.22); --lg-profile-b: #2b8a3e; --lg-history: rgba(201,154,6,.25); --lg-history-b: #b08700; }
+  .lg-top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .lg-seg { display: inline-flex; border: 1.5px solid var(--ink); overflow: hidden; }
+  .lg button { font: inherit; color: var(--ink); background: transparent; border: 0; padding: 3px 12px; cursor: pointer; }
+  .lg-seg button + button { border-left: 1.5px solid var(--ink); }
+  .lg-seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+  .lg-replay { border: 1.5px dashed var(--ink) !important; }
+  .lg-query { font-family: var(--f-mono); font-size: 13px; color: var(--ink-soft); margin-bottom: 12px; }
+  .lg-query b { color: var(--mark); }
+  .lg-file { margin: 0 0 12px; }
+  .lg-label { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 4px; }
+  .lg-badge { font-size: 15px; border: 1.5px solid currentColor; border-radius: 999px; padding: 0 8px; color: var(--mark); }
+  .lg-strip { position: relative; display: flex; gap: 4px; padding: 6px; border: 2px solid var(--ink); min-height: 58px; }
+  .lg-blk { border: 1.5px solid; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 15px; line-height: 1.1; text-align: center; padding: 2px; opacity: .4; transition: opacity .25s, transform .25s, box-shadow .25s; }
+  .lg-blk small { font-size: 13px; opacity: .8; }
+  .lg-blk.auth { background: var(--lg-auth); border-color: var(--lg-auth-b); flex: 0 0 52px; }
+  .lg-blk.profile { background: var(--lg-profile); border-color: var(--lg-profile-b); flex: 0 0 66px; }
+  .lg-blk.history { background: var(--lg-history); border-color: var(--lg-history-b); flex: 1 1 110px; }
+  .lg-groups .lg-blk { flex: 1 1 0; }
+  .lg-blk.read { opacity: 1; box-shadow: 0 0 0 2px var(--ink) inset; }
+  .lg-blk.waste { background-image: repeating-linear-gradient(135deg, transparent 0 6px, rgba(128,110,90,.35) 6px 8px); }
+  .lg-blk.hit { transform: translateY(-3px); box-shadow: 0 0 0 2.5px var(--lg-auth-b); }
+  .lg-head { position: absolute; top: -6px; bottom: -6px; width: 3px; background: var(--mark); left: 6px; opacity: 0; transition: left .45s ease, opacity .2s; }
+  .lg-meter { display: flex; align-items: center; gap: 12px; margin-top: 10px; }
+  .lg-bar { flex: 1; height: 14px; border: 1.5px solid var(--ink); border-radius: 999px; overflow: hidden; }
+  .lg-bar i { display: block; height: 100%; width: 0; background: var(--mark); transition: width .45s ease; }
+  .lg-kb { font-family: var(--f-mono); font-size: 14px; min-width: 64px; text-align: right; }
+  .lg-note { color: var(--ink-soft); margin-top: 6px; min-height: 1.4em; }
+  .lg-legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 15px; margin-top: 8px; color: var(--ink-soft); }
+  .lg-legend span::before { content: ""; display: inline-block; width: 12px; height: 12px; border: 1.5px solid; margin-right: 5px; vertical-align: -1px; }
+  .lg-legend .l1::before { background: var(--lg-auth); border-color: var(--lg-auth-b); }
+  .lg-legend .l2::before { background: var(--lg-profile); border-color: var(--lg-profile-b); }
+  .lg-legend .l3::before { background: var(--lg-history); border-color: var(--lg-history-b); }
+  .lg-legend .l4::before { border-color: var(--ink); background: repeating-linear-gradient(135deg, transparent 0 4px, rgba(128,110,90,.6) 4px 5px); }
+  @media (max-width: 560px) { .lg-blk.auth { flex-basis: 40px; } .lg-blk.profile { flex-basis: 46px; } .lg-blk { font-size: 13px; } }
+</style>
+<div class="lg" id="lg">
+  <div class="lg-top">
+    <div class="lg-seg" role="group" aria-label="Storage layout">
+      <button type="button" data-mode="one" aria-pressed="true">one SSTable</button>
+      <button type="button" data-mode="groups" aria-pressed="false">locality groups</button>
+    </div>
+    <button type="button" class="lg-replay">▶ replay read</button>
+  </div>
+  <div class="lg-query">GET <b>auth:last_login</b> for user_41 … user_43</div>
+  <div class="lg-stage"></div>
+  <div class="lg-meter"><span>data read</span><div class="lg-bar"><i></i></div><span class="lg-kb">0 KB</span></div>
+  <div class="lg-note"></div>
+  <div class="lg-legend"><span class="l1">auth (~1 KB)</span><span class="l2">profile (~2 KB)</span><span class="l3">history (~40 KB)</span><span class="l4">read, but not needed</span></div>
+</div>
+<script>
+(function () {
+  const SIZES = { auth: 1, profile: 2, history: 40 };
+  const USERS = ["user_41", "user_42", "user_43"];
+  const FAMS = ["auth", "profile", "history"];
+  const root = document.getElementById("lg");
+  const stage = root.querySelector(".lg-stage"), bar = root.querySelector(".lg-bar i"),
+        kbEl = root.querySelector(".lg-kb"), note = root.querySelector(".lg-note");
+  const MAX = USERS.length * (1 + 2 + 40);
+  const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let mode = "one", timers = [];
+
+  function blk(f, u) {
+    const d = document.createElement("div");
+    d.className = "lg-blk " + f; d.dataset.f = f;
+    d.innerHTML = f + "<small>" + u.replace("user_", "u") + "</small>";
+    return d;
+  }
+  function file(label, badge, groups) {
+    const f = document.createElement("div"); f.className = "lg-file";
+    const l = document.createElement("div"); l.className = "lg-label";
+    l.innerHTML = "<span>" + label + "</span>" + (badge ? '<span class="lg-badge">' + badge + "</span>" : "");
+    const s = document.createElement("div"); s.className = "lg-strip" + (groups ? " lg-groups" : "");
+    f.append(l, s); stage.appendChild(f);
+    return s;
+  }
+  function head(strip) {
+    const h = document.createElement("div"); h.className = "lg-head"; strip.appendChild(h); return h;
+  }
+  function build() {
+    stage.innerHTML = "";
+    const plan = [];
+    if (mode === "one") {
+      const s = file("SSTable: every column family together");
+      USERS.forEach(u => FAMS.forEach(fm => { const b = blk(fm, u); s.appendChild(b); plan.push(b); }));
+      return { plan, h: head(s) };
+    }
+    let h;
+    [["auth", "locality group A: auth", "in memory"],
+     ["profile", "locality group B: profile", ""],
+     ["history", "locality group C: history", "compressed"]].forEach(([fm, label, badge]) => {
+      const s = file(label + " · own SSTable", badge, true);
+      USERS.forEach(u => { const b = blk(fm, u); s.appendChild(b); if (fm === "auth") plan.push(b); });
+      if (fm === "auth") h = head(s);
+    });
+    return { plan, h };
+  }
+  function run() {
+    timers.forEach(clearTimeout); timers = [];
+    const { plan, h } = build();
+    let read = 0; bar.style.width = "0"; kbEl.textContent = "0 KB"; note.textContent = "";
+    const step = b => {
+      h.style.opacity = 1; h.style.left = (b.offsetLeft + b.offsetWidth / 2 - 1) + "px";
+      read += SIZES[b.dataset.f];
+      b.classList.add(b.dataset.f === "auth" ? "hit" : "waste", "read");
+      bar.style.width = (read / MAX * 100) + "%"; kbEl.textContent = read + " KB";
+    };
+    const finish = () => {
+      h.style.opacity = 0;
+      note.textContent = mode === "one"
+        ? "Read " + read + " KB to get 3 KB of auth. Most of the scan was order history we never asked for."
+        : "Read " + read + " KB, straight from memory. Profile and history were never touched.";
+    };
+    if (reduce) { plan.forEach(step); finish(); return; }
+    const dt = mode === "one" ? 420 : 520;
+    plan.forEach((b, i) => timers.push(setTimeout(() => step(b), 400 + i * dt)));
+    timers.push(setTimeout(finish, 400 + plan.length * dt + 200));
+  }
+  root.querySelectorAll(".lg-seg button").forEach(btn => btn.addEventListener("click", () => {
+    mode = btn.dataset.mode;
+    root.querySelectorAll(".lg-seg button").forEach(b => b.setAttribute("aria-pressed", b === btn ? "true" : "false"));
+    run();
+  }));
+  root.querySelector(".lg-replay").addEventListener("click", run);
+  if ("IntersectionObserver" in window) {
+    build();
+    new IntersectionObserver((es, o) => es.forEach(e => { if (e.isIntersecting) { run(); o.disconnect(); } }), { threshold: .4 }).observe(root);
+  } else run();
+})();
+</script>
